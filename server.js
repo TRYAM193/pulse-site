@@ -185,6 +185,36 @@ function requireClientAuth(req, res, next) {
 }
 
 /**
+ * Verifies if either an admin token or a scoped client token is present.
+ */
+function requireAdminOrClientAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  const token = (authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null) || req.cookies?.admin_token || req.cookies?.client_token;
+
+  if (!token) {
+    return res.status(401).json({ error: 'Authentication required.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.role === 'admin') {
+      req.adminAuth = decoded;
+      return next();
+    } else if (decoded.role === 'client') {
+      const routeClientId = req.params.clientId;
+      if (routeClientId && decoded.clientId !== routeClientId) {
+        return res.status(403).json({ error: 'Access denied: client scope mismatch.' });
+      }
+      req.clientAuth = decoded;
+      return next();
+    }
+    return res.status(403).json({ error: 'Access denied: invalid role.' });
+  } catch {
+    return res.status(401).json({ error: 'Invalid or expired token.' });
+  }
+}
+
+/**
  * Checks if client has an active subscription.
  */
 async function requireActiveSubscription(req, res, next) {
@@ -1181,8 +1211,8 @@ app.post('/api/clients/:clientId/bookings/:bookingId/status', validateClientIdPa
   }
 });
 
-// Admin Stripe subscribe link creator
-app.post('/api/clients/:clientId/subscribe', validateClientIdParam, requireAdminAuth, async (req, res) => {
+// Stripe subscribe link creator (accessible by admin or matching client)
+app.post('/api/clients/:clientId/subscribe', validateClientIdParam, requireAdminOrClientAuth, async (req, res) => {
   const { clientId } = req.params;
 
   try {
