@@ -1,0 +1,26 @@
+{
+  "businessName": "Aura Hair Salon & Spa",
+  "niche": "hair_salon",
+  "contact": {
+    "phone": "+1 (555) 123-4567",
+    "email": "contact@aurasalon.com",
+    "address": "123 Beauty Lane, Seattle, WA 98101"
+  },
+  "services": {
+    "Classic Haircut": 40,
+    "Beard Styling": 20,
+    "Hair Coloring": 80,
+    "Deep Conditioning": 40,
+    "Premium Facial": 65
+  },
+  "hours": {
+    "Monday": "9 AM - 6 PM",
+    "Tuesday": "9 AM - 6 PM",
+    "Wednesday": "9 AM - 6 PM",
+    "Thursday": "9 AM - 6 PM",
+    "Friday": "9 AM - 7 PM",
+    "Saturday": "10 AM - 5 PM",
+    "Sunday": "Closed"
+  },
+  "bookings": []
+}

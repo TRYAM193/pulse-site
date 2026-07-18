@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseSite | Living Websites. Real-Time AI Updates.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --card: #111111;
+      --card-hover: #181818;
+      --border: #222222;
+      --border-light: #333333;
+      --text-primary: #ffffff;
+      --text-secondary: #888888;
+      --text-muted: #555555;
+      --accent: #ffffff;
+      --accent-invert: #000000;
+      --badge-bg: #1f1f1f;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+    /* Layout Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Navigation */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 72px;
+    }
+
+    .brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-badge {
+      background: var(--text-primary);
+      color: var(--accent-invert);
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    .btn-primary {
+      background: var(--text-primary);
+      color: var(--accent-invert);
+      border: 1px solid var(--text-primary);
+    }
+
+    .btn-primary:hover {
+      background: #e6e6e6;
+      border-color: #e6e6e6;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-primary);
+      background: var(--card);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 160px 0 100px;
+      text-align: center;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .hero-pill .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--text-primary);
+      border-radius: 50%;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: 3.8rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .hero h1 span {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto 2.5rem;
+      font-weight: 400;
+    }
+
+    .hero-cta {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 4rem;
+    }
+
+    /* Demo / Simulator Window */
+    .demo-window {
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      text-align: left;
+    }
+
+    .demo-header {
+      background: var(--bg);
+      padding: 0.8rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .demo-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .demo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-light);
+    }
+
+    .demo-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-left: auto;
+      font-family: monospace;
+    }
+
+    .demo-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 420px;
+    }
+
+    @media (max-width: 768px) {
+      .demo-body { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2.5rem; }
+    }
+
+    .demo-chat {
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      background: #050505;
+    }
+
+    .chat-messages {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .chat-bubble {
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      max-width: 90%;
+      line-height: 1.5;
+    }
+
+    .chat-bubble.ai {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      align-self: flex-start;
+    }
+
+    .chat-bubble.user {
+      background: var(--text-primary);
+      color: var(--accent-invert);
+      align-self: flex-end;
+      font-weight: 500;
+    }
+
+    .chat-input-box {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.6rem 0.8rem;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: var(--text-primary);
+    }
+
+    .demo-preview {
+      padding: 1.5rem;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .preview-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .preview-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .preview-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--text-primary);
+    }
+
+    .preview-header p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .preview-services {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .service-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px dashed var(--border);
+      font-size: 0.85rem;
+    }
+
+    .service-price {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .preview-footer {
+      margin-top: 1.5rem;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-tag {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: #10b981;
+      border-radius: 50%;
+    }
+
+    /* Features Grid */
+    .section {
+      padding: 100px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 4rem;
+    }
+
+    .section-title h2 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: border-color 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-light);
+    }
+
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* Pricing Section */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .pricing-card.featured {
+      background: var(--card);
+      border: 1px solid var(--text-primary);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      right: 24px;
+      background: var(--text-primary);
+      color: var(--accent-invert);
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .pricing-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-header p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .price {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+    }
+
+    .price span {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .pricing-list {
+      list-style: none;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .pricing-list li {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .pricing-list li.included {
+      color: var(--text-primary);
+    }
+
+    .pricing-list li.disabled {
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    /* Security Banner */
+    .security-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .security-banner { flex-direction: column; text-align: center; }
+    }
+
+    .security-info h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .security-info p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Footer */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header>
+    <div class="container nav-wrapper">
+      <a href="/" class="brand">
+        PulseSite <span class="brand-badge">PRO</span>
+      </a>
+      <div class="nav-links">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#security">Security</a>
+        <a href="/client-login" class="btn btn-secondary">Client Login</a>
+        <a href="/admin/login" class="btn btn-primary">Admin Console</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-pill">
+        <span class="dot"></span> 100% Autonomous Local Business Web Engine
+      </div>
+      <h1>Instant AI Websites.<br><span>Free Preview. Pay to Deploy.</span></h1>
+      <p>PulseSite automatically builds custom websites for local businesses in seconds. Test your design for free in trial mode, then activate Pro to enable live AI updates and appointment booking.</p>
+      
+      <div class="hero-cta">
+        <a href="/client/test_client/" target="_blank" class="btn btn-primary">See Live Demo Site →</a>
+        <a href="/client-login" class="btn btn-secondary">Access Client Portal</a>
+      </div>
+
+      <!-- Live Interactive Simulator Window -->
+      <div class="demo-window">
+        <div class="demo-header">
+          <div class="demo-dots">
+            <div class="demo-dot"></div>
+            <div class="demo-dot"></div>
+            <div class="demo-dot"></div>
+          </div>
+          <div class="demo-title">pulsesite-ai-editor.sim</div>
+        </div>
+        <div class="demo-body">
+          <!-- Left: Simulated Chat -->
+          <div class="demo-chat">
+            <div class="chat-messages" id="simChat">
+              <div class="chat-bubble ai">
+                👋 Hello! I'm your AI Website Manager. Try updating the price of "Classic Haircut" to $45 or adding Sunday hours!
+              </div>
+              <div class="chat-bubble user">
+                Change Classic Haircut to $45 and add a new service "Beard Trim" for $25.
+              </div>
+              <div class="chat-bubble ai">
+                ✅ Done! I updated your services and re-compiled your live site. See preview on right.
+              </div>
+            </div>
+            <div class="chat-input-box">
+              <input type="text" id="simInput" class="chat-input" placeholder="Type an update e.g. 'Add Keratin Treatment for $90'..." />
+              <button class="btn btn-primary" style="padding:0.5rem 1rem;font-size:0.8rem;" onclick="runSimulation()">Update</button>
+            </div>
+          </div>
+
+          <!-- Right: Simulated Live Preview -->
+          <div class="demo-preview">
+            <div class="preview-card">
+              <div>
+                <div class="preview-header">
+                  <h3 id="simBizName">Aura Hair Salon & Spa</h3>
+                  <p>Seattle, WA • (206) 555-0199</p>
+                </div>
+                <div class="preview-services" id="simServices">
+                  <div class="service-row">
+                    <span>Classic Haircut</span>
+                    <span class="service-price" id="haircutPrice">$45</span>
+                  </div>
+                  <div class="service-row">
+                    <span>Beard Trim</span>
+                    <span class="service-price">$25</span>
+                  </div>
+                  <div class="service-row">
+                    <span>Full Hair Coloring</span>
+                    <span class="service-price">$120</span>
+                  </div>
+                </div>
+              </div>
+              <div class="preview-footer">
+                <div class="status-tag">
+                  <span class="status-dot"></span> Recompiled Live
+                </div>
+                <span style="font-size:0.75rem;color:#888;">Updated via Gemini AI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div class="section-title">
+        <h2>Three Steps to Production</h2>
+        <p>A seamless transition from free trial preview to full-stack live deployment.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>1. Instant Free Preview</h3>
+          <p>The AI swarm analyzes brand assets and generates a complete, responsive website for your business with zero upfront cost.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>2. Pro Activation ($49/mo)</h3>
+          <p>Subscribe to unlock full-stack hosting, custom domain mapping, appointment booking management, and live AI editing capabilities.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>3. Conversational Updates</h3>
+          <p>Update prices, add services, or alter business hours simply by chatting with the AI via your portal dashboard or WhatsApp.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-title">
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Start with a free 14-day preview. Upgrade when you're ready to deploy.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <!-- Free Trial -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>14-Day Free Preview</h3>
+            <p>Perfect for reviewing your AI-generated website layout.</p>
+          </div>
+          <div class="price">$0 <span>/ 14 days</span></div>
+          <ul class="pricing-list">
+            <li class="included">✓ Full Website Generation</li>
+            <li class="included">✓ Live Preview Link</li>
+            <li class="disabled">✕ AI Chat Updates (Locked)</li>
+            <li class="disabled">✕ Customer Booking Engine</li>
+            <li class="disabled">✕ WhatsApp Webhook Sync</li>
+          </ul>
+          <a href="/client-login" class="btn btn-secondary">Start Free Preview</a>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="pricing-card featured">
+          <div class="pricing-badge">RECOMMENDED</div>
+          <div class="pricing-header">
+            <h3>PulseSite Pro</h3>
+            <p>Complete full-stack website + AI editor & booking system.</p>
+          </div>
+          <div class="price">$49 <span>/ month</span></div>
+          <ul class="pricing-list">
+            <li class="included">✓ Full Website Generation</li>
+            <li class="included">✓ Unlimited AI Chat Updates</li>
+            <li class="included">✓ Automated 30-Min Booking Engine</li>
+            <li class="included">✓ WhatsApp Site Updates</li>
+            <li class="included">✓ Visitor Analytics Dashboard</li>
+          </ul>
+          <a href="/client-login" class="btn btn-primary">Upgrade to Pro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security -->
+  <section class="section" id="security" style="border-bottom:none;">
+    <div class="container">
+      <div class="security-banner">
+        <div class="security-info">
+          <h3>🔒 Built with Enterprise Security</h3>
+          <p>Strict client isolation, encrypted JWT tokens, rate-limited endpoints, and prompt-injection defense built-in.</p>
+        </div>
+        <a href="/admin/login" class="btn btn-secondary">Admin System Check</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 PulseSite. All rights reserved. Powered by Google Gemini 2.5 Pro.</p>
+    </div>
+  </footer>
+
+  <script>
+    function runSimulation() {
+      const input = document.getElementById('simInput');
+      const chat = document.getElementById('simChat');
+      const services = document.getElementById('simServices');
+
+      if (!input.value.trim()) return;
+
+      const userText = input.value;
+      
+      // Append user bubble
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-bubble user';
+      userMsg.textContent = userText;
+      chat.appendChild(userMsg);
+
+      input.value = '';
+      chat.scrollTop = chat.scrollHeight;
+
+      // Simulate AI processing
+      setTimeout(() => {
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'chat-bubble ai';
+        aiMsg.textContent = '✅ Done! Updated website services and recompiled preview.';
+        chat.appendChild(aiMsg);
+
+        // Add a new row to preview
+        const newRow = document.createElement('div');
+        newRow.className = 'service-row';
+        newRow.innerHTML = `<span>${userText.slice(0, 24)}...</span><span class="service-price">$90</span>`;
+        services.appendChild(newRow);
+
+        chat.scrollTop = chat.scrollHeight;
+      }, 800);
+    }
+  </script>
+</body>
+</html>

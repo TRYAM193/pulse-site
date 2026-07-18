@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseSite | Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: #080c14;
+      color: #f3f4f6;
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Gradient Background Glows */
+    .glow-1 {
+      position: absolute;
+      top: -10%;
+      left: 10%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .glow-2 {
+      position: absolute;
+      bottom: -10%;
+      right: 10%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 280px;
+      background: rgba(13, 20, 35, 0.8);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 2rem 1.5rem;
+      z-index: 10;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      color: #9ca3af;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: #f3f4f6;
+    }
+
+    .nav-link.active {
+      background: rgba(99, 102, 241, 0.1);
+      color: #6366f1;
+      border-left: 3px solid #6366f1;
+    }
+
+    .logout-btn {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      color: #ef4444;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex-grow: 1;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 2.5rem;
+      position: relative;
+    }
+
+    .header-section {
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-section h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .header-section p {
+      color: #9ca3af;
+      margin-top: 0.25rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+    }
+
+    .stat-card.blue::before { background-color: #3b82f6; }
+    .stat-card.purple::before { background-color: #a855f7; }
+    .stat-card.green::before { background-color: #10b981; }
+    .stat-card.orange::before { background-color: #f59e0b; }
+
+    .stat-title {
+      font-size: 0.875rem;
+      color: #9ca3af;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-val {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-change {
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 20px;
+      width: fit-content;
+    }
+
+    .stat-card.blue .stat-change { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .stat-card.purple .stat-change { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+    .stat-card.green .stat-change { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .stat-card.orange .stat-change { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+    /* Dashboard Layout Sections */
+    .dashboard-tab {
+      display: none;
+    }
+
+    .dashboard-tab.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Common Card Styling */
+    .section-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Activity Feed List */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+    }
+
+    .activity-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .activity-icon.pageview { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .activity-icon.booking { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+
+    .activity-details {
+      flex-grow: 1;
+    }
+
+    .activity-details p {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .activity-details span {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .activity-time {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    /* Buttons & Inputs */
+    .btn-gradient {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-gradient:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #d1d5db;
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .form-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-control {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      flex-grow: 1;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    select.form-control {
+      background-color: #0b111e;
+      cursor: pointer;
+    }
+
+    /* Table Styling */
+    .custom-table-container {
+      overflow-x: auto;
+    }
+
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .custom-table th {
+      color: #9ca3af;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .custom-table td {
+      padding: 1.25rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.95rem;
+    }
+
+    .custom-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-badge.active { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .status-badge.trial { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .status-badge.approved { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .status-badge.pending { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .status-badge.rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+    /* Side Panel Console Overlay */
+    .side-panel-overlay {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      display: none;
+      justify-content: flex-end;
+    }
+
+    .side-panel {
+      width: 550px;
+      height: 100%;
+      background: #0b111e;
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      padding: 2rem;
+    }
+
+    .side-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .side-panel-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .side-panel-close {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .side-panel-close:hover {
+      color: #ef4444;
+    }
+
+    .side-panel-nav {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 1.5rem;
+    }
+
+    .side-panel-nav-btn {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .side-panel-nav-btn.active {
+      color: #6366f1;
+    }
+
+    .side-panel-nav-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #6366f1;
+    }
+
+    .side-panel-content {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .side-panel-tab {
+      display: none;
+    }
+
+    .side-panel-tab.active {
+      display: block;
+    }
+
+    /* Pitch container */
+    .pitch-text-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 1.5rem;
+      font-family: monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: #e5e7eb;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+  </style>
+</head>
+<body>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo-container">
+      <div class="logo-icon">🚀</div>
+      <span class="logo-text">PulseSite</span>
+    </div>
+    <ul class="nav-links">
+      <li><a class="nav-link active" onclick="switchTab('overview')">📊 Overview</a></li>
+      <li><a class="nav-link" onclick="switchTab('prospector')">🔎 Lead Scout</a></li>
+      <li><a class="nav-link" onclick="switchTab('sites')">🌐 Generated Sites</a></li>
+      <li><a class="nav-link" onclick="switchTab('revenue')">💰 Revenue & Billing</a></li>
+      <li><a class="nav-link" onclick="switchTab('incidents')">🚨 Incident Alerts</a></li>
+    </ul>
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="header-section">
+      <div>
+        <h1 id="header-greeting">Good morning, Admin ✨</h1>
+        <p id="header-date">Loading date...</p>
+      </div>
+      <div>
+        <button class="btn-outline" onclick="loadAllStats()">🔄 Refresh Data</button>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────── -->
+    <!-- TAB 1: OVERVIEW -->
+    <!-- ────────────────────────────────────────── -->
+    <div id="overview" class="dashboard-tab active">
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <span class="stat-title">Total Clients</span>
+          <span class="stat-val" id="stat-total-clients">0</span>
+          <span class="stat-change">Realtime</span>
+        </div>
+        <div class="stat-card purple">
+          <span class="stat-title">Monthly Revenue</span>
+          <span class="stat-val" id="stat-mrr">$0</span>
+          <span class="stat-change">Realtime</span>
+        </div>
+        <div class="stat-card green">
+          <span class="stat-title">Total Bookings</span>
+          <span class="stat-val" id="stat-total-bookings">0</span>
+          <span class="stat-change">Realtime</span>
+        </div>
+        <div class="stat-card orange">
+          <span class="stat-title">Active Sites</span>
+          <span class="stat-val" id="stat-active-sites">0</span>
+          <span class="stat-change">Realtime</span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-card">
+        <h2 class="section-title">⚡ Quick Actions</h2>
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn-gradient" onclick="switchTab('prospector')">🔎 Scout New Leads</button>
+          <button class="btn-outline" onclick="switchTab('sites')">🌐 View All Generated Sites</button>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="section-card">
+        <h2 class="section-title">📈 Live Activity Feed</h2>
+        <div class="activity-list" id="activity-feed">
+          <p style="color: #9ca3af;">Loading live feed events...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────── -->
+    <!-- TAB 2: LEAD PROSPECTOR -->
+    <!-- ────────────────────────────────────────── -->
+    <div id="prospector" class="dashboard-tab">
+      <div class="section-card">
+        <h2 class="section-title">🔎 Find Local Business Leads</h2>
+        <p style="color: #9ca3af; margin-bottom: 1.5rem;">Scout businesses that do not have websites or have slow-loading platforms, and provision instant bespoke sites for them.</p>
+
+        <div class="form-group">
+          <select class="form-control" id="prospect-niche" style="max-width: 250px;">
+            <option value="hair_salon">💇 Hair Salon</option>
+            <option value="plumber">🪠 Plumber</option>
+            <option value="dentist">🦷 Dentist</option>
+            <option value="restaurant">🍔 Restaurant</option>
+            <option value="gym">🏋️ Gym</option>
+            <option value="spa">🧖 Spa & Wellness</option>
+          </select>
+          <input type="text" class="form-control" id="prospect-city" placeholder="e.g. Seattle, Dallas, Chicago" value="Seattle">
+          <button class="btn-gradient" onclick="scoutLeads()">Find Leads</button>
+        </div>
+
+        <div class="custom-table-container">
+          <table class="custom-table" id="prospect-table" style="display: none;">
+            <thead>
+              <tr>
+                <th>Business Name & Address</th>
+                <th>Rating</th>
+                <th>Reviews</th>
+                <th>Estimated Missed Value</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="prospect-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+          <p id="prospect-status" style="color: #9ca3af; text-align: center; padding: 2rem 0;">Enter a city and click Find Leads to start.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────── -->
+    <!-- TAB 3: GENERATED SITES -->
+    <!-- ────────────────────────────────────────── -->
+    <div id="sites" class="dashboard-tab">
+      <div class="section-card">
+        <h2 class="section-title">🌐 Generated Client Portals</h2>
+        <p style="color: #9ca3af; margin-bottom: 1.5rem;">View live websites, monitor traffic metrics, and approve/reject bookings on behalf of client portals.</p>
+
+        <div class="custom-table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Business Name</th>
+                <th>Niche</th>
+                <th>Subscription</th>
+                <th>Created At</th>
+                <th>Outreach Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="clients-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────── -->
+    <!-- TAB 4: REVENUE & BILLING -->
+    <!-- ────────────────────────────────────────── -->
+    <div id="revenue" class="dashboard-tab">
+      <div class="section-card">
+        <h2 class="section-title">💰 Monthly Recurring Revenue Breakdown</h2>
+        <p style="color: #9ca3af; margin-bottom: 1.5rem;">See subscription updates, upgrade trials to active payment status, and verify total SaaS MRR output.</p>
+
+        <div class="custom-table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Business Name</th>
+                <th>Owner Email</th>
+                <th>Status</th>
+                <th>Monthly Rate</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="revenue-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────── -->
+    <!-- TAB 5: INCIDENT ALERTS & SUPPORT -->
+    <!-- ────────────────────────────────────────── -->
+    <div id="incidents" class="dashboard-tab">
+      <div class="section-card">
+        <h2 class="section-title">🚨 Support Incidents & Emergency Alerts</h2>
+        <p style="color: #9ca3af; margin-bottom: 1.5rem;">All CRITICAL and HIGH severity alerts are automatically emailed to <strong>shreyaskumarswamy2007@gmail.com</strong> in real-time.</p>
+
+        <div class="custom-table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Severity</th>
+                <th>Client / Source</th>
+                <th>Summary / Details</th>
+                <th>Status</th>
+                <th>Timestamp</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="incidents-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Side Panel console -->
+  <div class="side-panel-overlay" id="side-panel-overlay" onclick="closeSidePanel()">
+    <div class="side-panel" id="side-panel" onclick="event.stopPropagation()">
+      <div class="side-panel-header">
+        <span class="side-panel-title" id="panel-business-name">Business Profile</span>
+        <button class="side-panel-close" onclick="closeSidePanel()">✕</button>
+      </div>
+
+      <div class="side-panel-nav">
+        <button class="side-panel-nav-btn active" onclick="switchPanelTab('analytics')">📊 Analytics</button>
+        <button class="side-panel-nav-btn" onclick="switchPanelTab('pitch')">✉️ Outreach Pitch</button>
+        <button class="side-panel-nav-btn" onclick="switchPanelTab('hosting')">🚀 Access & Settings</button>
+      </div>
+
+      <div class="side-panel-content">
+        <!-- Panel Tab 1: Analytics -->
+        <div class="side-panel-tab active" id="panel-tab-analytics">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+            <div class="stat-card blue" style="padding: 1rem;">
+              <span class="stat-title" style="font-size: 0.75rem;">Page Views</span>
+              <span class="stat-val" id="panel-pageviews" style="font-size: 1.5rem;">0</span>
+            </div>
+            <div class="stat-card green" style="padding: 1rem;">
+              <span class="stat-title" style="font-size: 0.75rem;">Bookings</span>
+              <span class="stat-val" id="panel-bookings" style="font-size: 1.5rem;">0</span>
+            </div>
+          </div>
+          
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Client Appointments</h3>
+          <div class="custom-table-container">
+            <table class="custom-table" style="font-size: 0.85rem;">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="panel-bookings-tbody">
+                <!-- Dynamically filled -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Panel Tab 2: Pitch -->
+        <div class="side-panel-tab" id="panel-tab-pitch">
+          <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem;">Ready-to-send AI copy summarizing missed local business revenue.</p>
+          <div class="pitch-text-box" id="panel-pitch-content">
+            Loading sales audit pitch...
+          </div>
+        </div>
+
+        <!-- Panel Tab 3: Hosting -->
+        <div class="side-panel-tab" id="panel-tab-hosting">
+          <h4 style="margin-bottom: 0.5rem; font-size: 1.05rem;">Client Login Access</h4>
+          <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1.5rem;">Use these details to hand over this premium portal to the client.</p>
+
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+            <p style="margin-bottom: 0.5rem;"><strong>Portal URL:</strong> <a id="panel-portal-link" href="#" target="_blank" style="color: #6366f1; text-decoration: none;">/client-login</a></p>
+            <p style="margin-bottom: 0.5rem;"><strong>Default Username:</strong> <span id="panel-owner-email" style="color: #e5e7eb;">owner@sample.com</span></p>
+            <p><strong>Default Password:</strong> <span style="color: #e5e7eb; font-family: monospace;">password123</span></p>
+          </div>
+
+          <h4 style="margin-bottom: 0.5rem; font-size: 1.05rem;">Live Preview URL</h4>
+          <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem;">The customer-facing portal site is live at:</p>
+          <a id="panel-live-preview-url" href="#" target="_blank" class="btn-gradient" style="text-decoration: none; display: inline-flex;">View Customer Site 🔗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client-side Logic -->
+  <script>
+    const token = localStorage.getItem('admin_token');
+
+    // Protect dashboard on load
+    if (!token) {
+      window.location.href = '/admin/login';
+    }
+
+    // Set date
+    document.getElementById('header-date').innerText = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    async function apiFetch(url, options = {}) {
+      options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+      const res = await fetch(url, options);
+      if (res.status === 401) {
+        localStorage.removeItem('admin_token');
+        window.location.href = '/admin/login';
+        throw new Error('Unauthorized');
+      }
+      return res;
+    }
+
+    // Tab switcher
+    function switchTab(tabId) {
+      document.querySelectorAll('.dashboard-tab').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+
+      if (tabId === 'sites') loadClients();
+      if (tabId === 'revenue') loadRevenueBreakdown();
+      if (tabId === 'incidents') loadIncidents();
+    }
+
+    // Load stats
+    async function loadAllStats() {
+      try {
+        const res = await apiFetch('/api/admin/stats');
+        const stats = await res.json();
+        
+        document.getElementById('stat-total-clients').innerText = stats.totalClients;
+        document.getElementById('stat-mrr').innerText = `$${stats.mrr}`;
+        document.getElementById('stat-total-bookings').innerText = stats.totalBookings;
+        document.getElementById('stat-active-sites').innerText = stats.activeSites;
+
+        // Load activity feed
+        const activityRes = await apiFetch('/api/admin/activity');
+        const activity = await activityRes.json();
+        
+        const feedContainer = document.getElementById('activity-feed');
+        if (activity.length === 0) {
+          feedContainer.innerHTML = `<p style="color: #9ca3af; padding: 1rem 0;">No live traffic events logged yet.</p>`;
+          return;
+        }
+
+        feedContainer.innerHTML = activity.map(act => {
+          const typeLabel = act.event_type === 'pageview' ? 'Page View logged' : 'New Customer Booking';
+          const typeIcon = act.event_type === 'pageview' ? '🟢' : '📅';
+          const time = new Date(act.timestamp).toLocaleTimeString();
+          return `
+            <div class="activity-item">
+              <div class="activity-icon ${act.event_type === 'pageview' ? 'pageview' : 'booking'}">${typeIcon}</div>
+              <div class="activity-details">
+                <p>${act.business_name || act.client_id}</p>
+                <span>${typeLabel}</span>
+              </div>
+              <div class="activity-time">${time}</div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Load Overview stats on load
+    loadAllStats();
+    setInterval(loadAllStats, 30000); // refresh activity every 30s
+
+    // Scout Leads
+    async function scoutLeads() {
+      const niche = document.getElementById('prospect-niche').value;
+      const city = document.getElementById('prospect-city').value;
+      
+      const statusText = document.getElementById('prospect-status');
+      const table = document.getElementById('prospect-table');
+      const tbody = document.getElementById('prospect-tbody');
+
+      statusText.innerText = "🔍 Scouting Google Places for businesses missing websites...";
+      table.style.display = 'none';
+
+      try {
+        const res = await apiFetch(`/api/leads?niche=${niche}&city=${city}`);
+        const leads = await res.json();
+
+        if (leads.length === 0) {
+          statusText.innerText = "No qualifying leads without websites found in this region.";
+          return;
+        }
+
+        function escapeHtml(str) {
+          if (!str) return '';
+          return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        statusText.style.display = 'none';
+        table.style.display = 'table';
+        
+        tbody.innerHTML = leads.map(lead => `
+          <tr id="row-${lead.id}">
+            <td>
+              <strong>${escapeHtml(lead.businessName)}</strong><br>
+              <span style="color: #9ca3af; font-size: 0.85rem;">📍 ${escapeHtml(lead.address || 'Unknown Address')}</span>
+            </td>
+            <td>⭐ ${escapeHtml(String(lead.rating || 'N/A'))}</td>
+            <td>${escapeHtml(String(lead.reviews || 0))} reviews</td>
+            <td style="color: #ef4444; font-weight: 700;">$${Math.round(lead.lostRevenue || 3500)}/mo</td>
+            <td>
+              <button class="btn-gradient" onclick='provisionSite(${JSON.stringify(lead).replace(/'/g, "&apos;")})'>Generate Site</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch {
+        statusText.innerText = "Failed to scout leads. Ensure places API is configured or mock server is live.";
+      }
+    }
+
+    // Provision Site
+    async function provisionSite(lead) {
+      const row = document.getElementById(`row-${lead.id}`);
+      const btnCell = row.querySelector('td:last-child');
+      
+      btnCell.innerHTML = `<span style="color: #a855f7; font-weight: 700;">⚙️ Generating site via Swarm...</span>`;
+
+      try {
+        const res = await apiFetch('/api/leads/provision', {
+          method: 'POST',
+          body: JSON.stringify({ lead })
+        });
+        const result = await res.json();
+        
+        if (result.success) {
+          btnCell.innerHTML = `<a href="/client/${lead.id}/" target="_blank" style="color: #10b981; font-weight: 700; text-decoration: none;">✓ Generated! View Website</a>`;
+          loadAllStats();
+        } else {
+          btnCell.innerHTML = `<span style="color: #ef4444; font-weight: 700;">QA build failed. Retry.</span>`;
+        }
+      } catch (err) {
+        btnCell.innerHTML = `<span style="color: #ef4444; font-weight: 700;">Server Error</span>`;
+      }
+    }
+
+    // Load clients
+    async function loadClients() {
+      const tbody = document.getElementById('clients-tbody');
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af;">Loading client list...</td></tr>`;
+
+      try {
+        const res = await apiFetch('/api/clients');
+        const clients = await res.json();
+
+        if (clients.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af;">No websites generated yet. Go to Lead Scout tab.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = clients.map(client => `
+          <tr>
+            <td><strong>${client.businessName}</strong></td>
+            <td><span style="text-transform: capitalize;">${client.niche.replace('_', ' ')}</span></td>
+            <td><span class="status-badge ${client.stripe_status}">${client.stripe_status}</span></td>
+            <td>${new Date(client.created_at).toLocaleDateString()}</td>
+            <td><span style="font-family: monospace;">${client.owner_email}</span></td>
+            <td>
+              <button class="btn-outline" onclick="openSidePanel('${client.id}')">Manage Console</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444;">Error loading client list.</td></tr>`;
+      }
+    }
+
+    // Load Revenue Tab
+    async function loadRevenueBreakdown() {
+      const tbody = document.getElementById('revenue-tbody');
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #9ca3af;">Loading revenue list...</td></tr>`;
+
+      try {
+        const res = await apiFetch('/api/clients');
+        const clients = await res.json();
+
+        if (clients.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #9ca3af;">No generated client billing files.</td></tr>`;
+          return;
+        }
+
+        let totalSaaSMrr = 0;
+
+        tbody.innerHTML = clients.map(client => {
+          const rate = client.stripe_status === 'active' ? 49 : 0;
+          totalSaaSMrr += rate;
+          const actionBtn = client.stripe_status === 'trial' 
+            ? `<button class="btn-gradient" style="padding: 0.4rem 1rem; font-size: 0.85rem;" onclick="triggerSaaSActivation('${client.id}')">Upgrade to Active</button>`
+            : `<span style="color: #10b981; font-weight: 700;">Active Account</span>`;
+          return `
+            <tr>
+              <td><strong>${client.businessName}</strong></td>
+              <td>${client.owner_email}</td>
+              <td><span class="status-badge ${client.stripe_status}">${client.stripe_status}</span></td>
+              <td>$${rate}/mo</td>
+              <td>${actionBtn}</td>
+            </tr>
+          `;
+        }).join('') + `
+          <tr style="background: rgba(255,255,255,0.02); font-weight: 800;">
+            <td colspan="3" style="text-align: right;">Total SaaS MRR:</td>
+            <td colspan="2" style="color: #10b981; font-size: 1.15rem;">$${totalSaaSMrr}/mo</td>
+          </tr>
+        `;
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444;">Error building billing details.</td></tr>`;
+      }
+    }
+
+    async function triggerSaaSActivation(clientId) {
+      try {
+        const res = await apiFetch(`/api/clients/${clientId}/subscribe`, { method: 'POST' });
+        const data = await res.json();
+        if (data.url) {
+          window.open(data.url, '_blank');
+        }
+      } catch (err) {
+        alert("Failed to create Stripe sandbox checkout redirect.");
+      }
+    }
+
+    // Side panel actions
+    let activeClientId = null;
+
+    async function openSidePanel(clientId) {
+      activeClientId = clientId;
+      const overlay = document.getElementById('side-panel-overlay');
+      const panel = document.getElementById('side-panel');
+      
+      overlay.style.display = 'flex';
+      setTimeout(() => panel.style.transform = 'translateX(0)', 10);
+
+      // Reset tabs
+      switchPanelTab('analytics');
+
+      try {
+        const res = await apiFetch(`/api/clients/${clientId}/dashboard`);
+        const data = await res.json();
+
+        document.getElementById('panel-business-name').innerText = data.businessName;
+        document.getElementById('panel-pageviews').innerText = data.metrics.pageviews;
+        document.getElementById('panel-bookings').innerText = data.metrics.bookings;
+
+        // Render bookings list
+        const bookingsBody = document.getElementById('panel-bookings-tbody');
+        if (data.bookings.length === 0) {
+          bookingsBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #9ca3af;">No appointments.</td></tr>`;
+        } else {
+          bookingsBody.innerHTML = data.bookings.map(b => {
+            const date = new Date(b.booking_date).toLocaleDateString();
+            const dateStr = b.confirmed_slot ? `${date}<br><span style="color:#10b981;font-size:0.75rem;font-weight:700;">⏰ ${b.confirmed_slot}</span>` : date;
+            let actionBtn = `<span class="status-badge ${b.status}">${b.status}</span>`;
+            if (b.status === 'pending') {
+              actionBtn = `
+                <div style="display: flex; gap: 0.25rem;">
+                  <button class="btn-gradient" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="updateBookingStatus('${b.id}', 'approved')">✓</button>
+                  <button class="btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: #ef4444;" onclick="updateBookingStatus('${b.id}', 'rejected')">✕</button>
+                </div>
+              `;
+            }
+            return `
+              <tr>
+                <td><strong>${b.customer_name}</strong></td>
+                <td>${b.service_name}</td>
+                <td>${dateStr}</td>
+                <td>${actionBtn}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // Set hosting info
+        document.getElementById('panel-owner-email').innerText = data.ownerEmail;
+        document.getElementById('panel-portal-link').href = `/portal/${clientId}`;
+        document.getElementById('panel-live-preview-url').href = `/client/${clientId}/`;
+
+        // Pitch fetch
+        const pitchRes = await apiFetch(`/api/clients/${clientId}/pitch`);
+        const pitchData = await pitchRes.json();
+        document.getElementById('panel-pitch-content').innerText = pitchData.pitch;
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function closeSidePanel() {
+      const panel = document.getElementById('side-panel');
+      const overlay = document.getElementById('side-panel-overlay');
+      panel.style.transform = 'translateX(100%)';
+      setTimeout(() => overlay.style.display = 'none', 300);
+    }
+
+    function switchPanelTab(tabName) {
+      document.querySelectorAll('.side-panel-nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.side-panel-tab').forEach(tab => tab.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById(`panel-tab-${tabName}`).classList.add('active');
+    }
+
+    async function updateBookingStatus(bookingId, status) {
+      try {
+        const res = await apiFetch(`/api/clients/${activeClientId}/bookings/${bookingId}/status`, {
+          method: 'POST',
+          body: JSON.stringify({ status })
+        });
+        const result = await res.json();
+        if (result.success) {
+          openSidePanel(activeClientId);
+        }
+      } catch (err) {
+        alert("Failed to modify booking status on SQLite backend.");
+      }
+    }
+
+    // Load Incidents & Emergency Alerts
+    async function loadIncidents() {
+      const tbody = document.getElementById('incidents-tbody');
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af;">Loading incident log...</td></tr>`;
+
+      try {
+        const res = await apiFetch('/api/admin/incidents');
+        const incidents = await res.json();
+
+        if (incidents.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af;">No incidents or emergency alerts logged.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = incidents.map(inc => {
+          const sevColor = inc.severity === 'CRITICAL' ? '#ef4444' : inc.severity === 'HIGH' ? '#f59e0b' : '#3b82f6';
+          const sevBadge = `<span style="background: ${sevColor}22; color: ${sevColor}; border: 1px solid ${sevColor}44; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">${inc.severity}</span>`;
+          const actionBtn = inc.status === 'resolved' 
+            ? `<span style="color: #10b981; font-weight: 700; font-size: 0.8rem;">✓ Resolved</span>` 
+            : `<button class="btn-gradient" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="resolveIncident('${inc.id}')">Resolve Ticket</button>`;
+
+          return `
+            <tr>
+              <td>${sevBadge}</td>
+              <td><strong>${inc.businessName || inc.client_id}</strong></td>
+              <td style="max-width: 300px; font-size: 0.85rem;">${inc.title}<br><small style="color:#888;">${inc.message.slice(0, 120)}...</small></td>
+              <td><span class="status-badge ${inc.status === 'resolved' ? 'active' : 'trial'}">${inc.status}</span></td>
+              <td style="font-size: 0.8rem;">${new Date(inc.created_at).toLocaleString()}</td>
+              <td>${actionBtn}</td>
+            </tr>
+          `;
+        }).join('');
+      } catch {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444;">Error loading incidents.</td></tr>`;
+      }
+    }
+
+    async function resolveIncident(id) {
+      try {
+        const res = await apiFetch(`/api/admin/incidents/${id}/resolve`, { method: 'POST' });
+        if (res.ok) loadIncidents();
+      } catch {
+        alert("Failed to resolve incident.");
+      }
+    }
+
+    // Logout
+    async function logout() {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      localStorage.removeItem('admin_token');
+      window.location.href = '/admin/login';
+    }
+  </script>
+</body>
+</html>

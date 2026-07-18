@@ -1,0 +1,64 @@
+{
+  "businessName": "Aura Hair Salon & Spa",
+  "niche": "hair_salon",
+  "fontPairing": {
+    "headerFont": "Syne",
+    "bodyFont": "Inter",
+    "importUrl": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Syne:wght@700&display=swap');"
+  },
+  "colors": {
+    "bgMain": "hsl(220, 10%, 12%)",
+    "cardBg": "hsla(220, 10%, 18%, 0.5)",
+    "borderColor": "hsla(0, 0%, 100%, 0.1)",
+    "primaryGlow": "hsl(38, 85%, 65%)",
+    "accentGlow": "hsl(28, 60%, 55%)",
+    "textMain": "hsl(0, 0%, 94%)",
+    "textMuted": "hsl(220, 5%, 65%)"
+  },
+  "hero": {
+    "title": "Sculpting Style, Cultivating Confidence",
+    "accentText": "Confidence",
+    "subtext": "Step into Aura, Seattle's premier chic industrial hair studio. We master modern, low-maintenance cuts and lived-in color, meticulously crafted to amplify your unique flow and natural beauty."
+  },
+  "nicheCopy": {
+    "aboutHeading": "The Intersection of Form and Light",
+    "aboutBody": "Located in Capitol Hill, Aura is a space designed for collaboration and precision craft. We celebrate natural texture and architectural detail.",
+    "serviceIntro": "A curated range of hair styling and color maintenance options."
+  },
+  "services": {
+    "Classic Haircut": 40,
+    "Beard Styling": 20,
+    "Hair Coloring": 80,
+    "Deep Conditioning": 40,
+    "Premium Facial": 65
+  },
+  "hours": {
+    "Monday": "8am-8pm",
+    "Tuesday": "10am-5pm",
+    "Wednesday": "10am-5pm",
+    "Thursday": "10am-5pm",
+    "Friday": "10am-5pm",
+    "Saturday": "10am-5pm",
+    "Sunday": "Closed"
+  },
+  "contact": {
+    "phone": "+1 (555) 123-4567",
+    "email": "contact@aurasalon.com",
+    "address": "123 Beauty Lane, Seattle, WA 98101"
+  },
+  "testimonials": [
+    {
+      "name": "Alex Chen",
+      "text": "Best fade I've had in Seattle, hands down.",
+      "rating": 5
+    }
+  ],
+  "brandImages": [
+    "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80",
+    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80"
+  ],
+  "customFeatures": [
+    "30 mins booking slots with email confirmation",
+    "Interactive style gallery with before & after showcase"
+  ]
+}

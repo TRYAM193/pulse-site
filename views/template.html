@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{BUSINESS_NAME}} | Home</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary-glow: #6366f1;
+            --accent-glow: #a855f7;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient Glow Background Effects */
+        .glow-sphere {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+            filter: blur(50px);
+        }
+        .glow-top-right {
+            top: -100px;
+            right: -100px;
+        }
+        .glow-bottom-left {
+            bottom: -150px;
+            left: -150px;
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+        }
+
+        header {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-glow), var(--accent-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, var(--primary-glow), var(--accent-glow));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(168, 85, 247, 0.4);
+        }
+
+        .hero {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+
+        .grid-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1.5rem 5rem;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Glassmorphic Cards */
+        .glass-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+        }
+
+        /* Services List styling */
+        .services-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .service-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .service-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .service-price {
+            font-weight: 800;
+            color: #818cf8;
+            font-size: 1.1rem;
+        }
+
+        /* Hours Table styling */
+        .hours-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .hours-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .hours-row:last-child {
+            border-bottom: none;
+        }
+
+        .day-name {
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        .day-hours {
+            font-weight: 600;
+        }
+
+        /* Booking Form styling */
+        .booking-card {
+            grid-column: 1 / -1;
+            margin-top: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 0.9rem 1.2rem;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .booking-btn {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--primary-glow), var(--accent-glow));
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .booking-btn:hover {
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .booking-success {
+            display: none;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-sphere glow-top-right"></div>
+    <div class="glow-sphere glow-bottom-left"></div>
+
+    <header>
+        <div class="logo">{{BUSINESS_NAME}}</div>
+        <a href="#book-now" class="cta-btn">Book Appointment</a>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Premium Services by <br><span>{{BUSINESS_NAME}}</span></h1>
+            <p>Welcome to Seattle's premier destination for high-quality care, custom styling, and exceptional service. Book your session today.</p>
+            <a href="#book-now" class="cta-btn">Select Service & Book</a>
+        </section>
+
+        <section class="grid-container">
+            <!-- Services Card -->
+            <div class="glass-card">
+                <h2>Our Services</h2>
+                <div class="services-list" id="services-container">
+                    <!-- Loaded dynamically via client script -->
+                </div>
+            </div>
+
+            <!-- Hours & Location Card -->
+            <div class="glass-card">
+                <h2>Business Hours</h2>
+                <div class="hours-table" id="hours-container">
+                    <!-- Loaded dynamically via client script -->
+                </div>
+            </div>
+
+            <!-- Booking Section -->
+            <div class="glass-card booking-card" id="book-now">
+                <h2>Schedule Appointment</h2>
+                <form id="booking-form" onsubmit="handleBooking(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" required placeholder="john@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="service-select">Select Service</label>
+                            <select id="service-select" required>
+                                <option value="" disabled selected>Choose a service</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Preferred Date & Time</label>
+                            <input type="datetime-local" id="date" required>
+                        </div>
+                        <button type="submit" class="booking-btn">Confirm Booking</button>
+                    </div>
+                </form>
+                <div class="booking-success" id="booking-success-msg">
+                    🎉 Booking Request Submitted! We will contact you shortly to confirm.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 {{BUSINESS_NAME}}. Powered by AutoAgency.</p>
+    </footer>
+
+    <!-- Inject raw JSON site data from Express -->
+    <script>
+        window.SITE_DATA = {{SITE_DATA_JSON}};
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = window.SITE_DATA;
+            if (!data) return;
+
+            // 1. Populate Services
+            const servicesContainer = document.getElementById('services-container');
+            const selectEl = document.getElementById('service-select');
+            
+            if (data.services) {
+                Object.entries(data.services).forEach(([name, price]) => {
+                    // List item
+                    const item = document.createElement('div');
+                    item.className = 'service-item';
+                    item.innerHTML = `
+                        <span class="service-name">${name}</span>
+                        <span class="service-price">$${price}</span>
+                    `;
+                    servicesContainer.appendChild(item);
+
+                    // Form select option
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = `${name} - $${price}`;
+                    selectEl.appendChild(opt);
+                });
+            }
+
+            // 2. Populate Hours
+            const hoursContainer = document.getElementById('hours-container');
+            if (data.hours) {
+                Object.entries(data.hours).forEach(([day, sched]) => {
+                    const row = document.createElement('div');
+                    row.className = 'hours-row';
+                    row.innerHTML = `
+                        <span class="day-name">${day}</span>
+                        <span class="day-hours">${sched}</span>
+                    `;
+                    hoursContainer.appendChild(row);
+                });
+            }
+        });
+
+        function handleBooking(event) {
+            event.preventDefault();
+            
+            // Collect details
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const service = document.getElementById('service-select').value;
+            const date = document.getElementById('date').value;
+
+            console.log("Submitting Booking:", { name, email, service, date });
+
+            // Post booking details to Express server
+            fetch(window.location.pathname + '/book', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, service, date })
+            })
+            .then(res => res.json())
+            .then(resData => {
+                if (resData.success) {
+                    document.getElementById('booking-form').reset();
+                    const successMsg = document.getElementById('booking-success-msg');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 8000);
+                } else {
+                    alert("Error booking: " + resData.error);
+                }
+            })
+            .catch(err => {
+                console.error("Booking error:", err);
+                alert("Could not process booking. Try again.");
+            });
+        }
+    </script>
+</body>
+</html>

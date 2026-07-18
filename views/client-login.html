@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseSite | Client Portal Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:            #080c14;
+            --card-bg:       rgba(255, 255, 255, 0.03);
+            --card-border:   rgba(255, 255, 255, 0.07);
+            --card-radius:   24px;
+            --indigo:        #6366f1;
+            --indigo-light:  #818cf8;
+            --purple:        #a855f7;
+            --emerald:       #10b981;
+            --emerald-light: #34d399;
+            --text-primary:  #f3f4f6;
+            --text-secondary:#9ca3af;
+            --text-muted:    #6b7280;
+            --input-bg:      rgba(255, 255, 255, 0.04);
+            --input-border:  rgba(255, 255, 255, 0.09);
+            --gradient-brand: linear-gradient(135deg, #6366f1, #a855f7);
+            --gradient-btn:   linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Glow Spheres */
+        .glow-sphere {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(90px);
+            will-change: transform, opacity;
+        }
+        .glow-sphere--tr {
+            width: 700px; height: 700px;
+            top: -200px; right: -200px;
+            background: radial-gradient(circle, rgba(99,102,241,0.22) 0%, rgba(139,92,246,0.12) 40%, transparent 70%);
+            animation: driftTR 14s ease-in-out infinite;
+        }
+        .glow-sphere--bl {
+            width: 650px; height: 650px;
+            bottom: -180px; left: -180px;
+            background: radial-gradient(circle, rgba(168,85,247,0.20) 0%, rgba(16,185,129,0.10) 45%, transparent 70%);
+            animation: driftBL 17s ease-in-out infinite;
+        }
+        @keyframes driftTR {
+            0%, 100% { transform: translate(0,0) scale(1); opacity: 0.8; }
+            33%       { transform: translate(-40px,50px) scale(1.05); opacity: 1; }
+            66%       { transform: translate(30px,-30px) scale(0.95); opacity: 0.7; }
+        }
+        @keyframes driftBL {
+            0%, 100% { transform: translate(0,0) scale(1); opacity: 0.7; }
+            40%       { transform: translate(50px,-40px) scale(1.08); opacity: 1; }
+            75%       { transform: translate(-20px,30px) scale(0.93); opacity: 0.6; }
+        }
+        /* Layout */
+        .page-wrapper {
+            position: relative; z-index: 1;
+            min-height: 100vh;
+            display: flex; align-items: stretch;
+        }
+        .hero-side, .form-side {
+            flex: 1;
+            display: flex; align-items: center; justify-content: center;
+            padding: 3rem 4rem;
+        }
+        .hero-side {
+            position: relative; flex-direction: column;
+        }
+        .hero-side::after {
+            content: ''; position: absolute;
+            right: 0; top: 10%; height: 80%; width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.07) 25%, rgba(255,255,255,0.07) 75%, transparent);
+        }
+        .form-side {
+            flex: 0 0 480px; max-width: 560px; padding: 3rem 3.5rem;
+        }
+        /* Hero */
+        .hero-content { max-width: 520px; }
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(99,102,241,0.12);
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: 100px; padding: 0.35rem 1rem;
+            font-size: 0.78rem; font-weight: 600;
+            color: #818cf8; letter-spacing: 0.08em;
+            text-transform: uppercase; margin-bottom: 1.8rem;
+        }
+        .hero-eyebrow .dot {
+            width: 6px; height: 6px;
+            background: var(--emerald); border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.5; transform: scale(0.7); }
+        }
+        .hero-title {
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 800; color: #ffffff;
+            line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 1.2rem;
+        }
+        .hero-title .accent {
+            background: var(--gradient-brand);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-tagline {
+            font-size: 1.05rem; font-weight: 400;
+            color: var(--text-secondary); line-height: 1.65;
+            margin-bottom: 2.5rem; max-width: 400px;
+        }
+        /* Feature bullets */
+        .feature-list { display: flex; flex-direction: column; gap: 1rem; list-style: none; }
+        .feature-item {
+            display: flex; align-items: flex-start; gap: 0.9rem;
+            opacity: 0; transform: translateX(-20px);
+            animation: slideInFeature 0.6s ease forwards;
+        }
+        .feature-item:nth-child(1) { animation-delay: 0.4s; }
+        .feature-item:nth-child(2) { animation-delay: 0.6s; }
+        .feature-item:nth-child(3) { animation-delay: 0.8s; }
+        @keyframes slideInFeature { to { opacity: 1; transform: translateX(0); } }
+        .feature-check {
+            flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.3);
+            display: flex; align-items: center; justify-content: center; margin-top: 2px;
+        }
+        .feature-check svg {
+            width: 11px; height: 11px;
+            stroke: #10b981; stroke-width: 2.5;
+            fill: none; stroke-linecap: round; stroke-linejoin: round;
+        }
+        .feature-text { font-size: 0.95rem; font-weight: 500; color: var(--text-primary); line-height: 1.4; }
+        /* Stats */
+        .hero-stats {
+            margin-top: 3rem; display: flex; gap: 2.5rem;
+            padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .stat-block { display: flex; flex-direction: column; gap: 0.2rem; }
+        .stat-number {
+            font-size: 1.5rem; font-weight: 800;
+            background: var(--gradient-brand);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .stat-label { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.04em; }
+        /* Card */
+        .login-card {
+            width: 100%; max-width: 420px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--card-radius);
+            padding: 2.5rem;
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset, 0 32px 80px rgba(0,0,0,0.45), 0 0 60px rgba(99,102,241,0.05);
+            position: relative; overflow: hidden;
+            opacity: 0; transform: translateY(24px);
+            animation: cardReveal 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s forwards;
+        }
+        @keyframes cardReveal { to { opacity: 1; transform: translateY(0); } }
+        .login-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 10%; width: 80%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5) 40%, rgba(168,85,247,0.5) 60%, transparent);
+        }
+        .login-card::after {
+            content: ''; position: absolute;
+            top: -60px; right: -60px; width: 200px; height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        /* Brand */
+        .card-brand {
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            font-size: 0.82rem; font-weight: 700;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            background: var(--gradient-brand);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+        .card-brand-icon {
+            width: 22px; height: 22px;
+            background: var(--gradient-brand); border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .card-brand-icon svg { width: 12px; height: 12px; fill: white; }
+        .card-title { font-size: 1.65rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+        .card-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 2rem; font-weight: 400; }
+        /* Form */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.6rem; }
+        .input-wrapper { position: relative; }
+        .input-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; display: flex; align-items: center; }
+        .input-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .form-input {
+            width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px; color: var(--text-primary);
+            font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 400;
+            outline: none;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        }
+        .form-input::placeholder { color: var(--text-muted); font-weight: 400; }
+        .form-input:focus {
+            border-color: rgba(99,102,241,0.6);
+            background: rgba(99,102,241,0.04);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12), 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .toggle-pass {
+            position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: var(--text-muted);
+            cursor: pointer; display: flex; align-items: center; padding: 4px; border-radius: 6px;
+            transition: color 0.2s ease;
+        }
+        .toggle-pass:hover { color: var(--text-secondary); }
+        .toggle-pass svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        /* Meta row */
+        .form-meta { display: flex; align-items: center; justify-content: space-between; margin-top: -0.25rem; margin-bottom: 1.75rem; }
+        .remember-me { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+        .remember-me input[type="checkbox"] {
+            appearance: none; width: 16px; height: 16px;
+            border: 1px solid var(--input-border); border-radius: 4px;
+            background: var(--input-bg); cursor: pointer; position: relative;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .remember-me input[type="checkbox"]:checked { background: var(--gradient-brand); border-color: var(--indigo); }
+        .remember-me input[type="checkbox"]:checked::after {
+            content: ''; position: absolute; left: 4px; top: 2px;
+            width: 5px; height: 8px;
+            border: 2px solid white; border-top: none; border-left: none;
+            transform: rotate(45deg);
+        }
+        .remember-me span { font-size: 0.82rem; color: var(--text-muted); font-weight: 500; }
+        .forgot-link { font-size: 0.82rem; color: #818cf8; text-decoration: none; font-weight: 500; transition: opacity 0.2s; }
+        .forgot-link:hover { opacity: 0.7; }
+        /* Button */
+        .btn-submit {
+            width: 100%; padding: 0.95rem 1.5rem;
+            background: var(--gradient-btn); background-size: 200% 200%;
+            border: none; border-radius: 12px;
+            color: white; font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700;
+            cursor: pointer; position: relative; overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.3s ease, background-position 0.4s ease;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.35), 0 1px 3px rgba(0,0,0,0.3);
+            letter-spacing: 0.01em;
+        }
+        .btn-submit::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.5), 0 2px 6px rgba(0,0,0,0.4); background-position: right center; }
+        .btn-submit:active { transform: translateY(0px); box-shadow: 0 3px 12px rgba(99,102,241,0.3), 0 1px 3px rgba(0,0,0,0.3); }
+        .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+        .btn-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.35); border-top-color: white;
+            border-radius: 50%; animation: spin 0.7s linear infinite;
+            vertical-align: middle; margin-right: 0.5rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* View site */
+        .view-site-row { margin-top: 1.4rem; text-align: center; }
+        .view-site-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 0.88rem; font-weight: 600; color: var(--text-muted);
+            text-decoration: none; transition: color 0.25s ease, gap 0.25s ease;
+        }
+        .view-site-link:hover { color: var(--text-secondary); gap: 0.65rem; }
+        .view-site-link svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        /* Alert */
+        .alert {
+            display: flex; align-items: flex-start; gap: 0.7rem;
+            padding: 0.9rem 1rem; border-radius: 12px;
+            font-size: 0.87rem; font-weight: 500;
+            margin-bottom: 1.4rem; line-height: 1.4;
+            opacity: 0; transform: translateY(-8px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .alert.visible { opacity: 1; transform: translateY(0); }
+        .alert--error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+        .alert--success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: #34d399; }
+        .alert-icon { flex-shrink: 0; margin-top: 1px; }
+        .alert-icon svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        /* Card footer */
+        .card-footer { margin-top: 1.8rem; padding-top: 1.4rem; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .card-footer p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+        .card-footer a { color: #818cf8; text-decoration: none; font-weight: 500; }
+        .card-footer a:hover { text-decoration: underline; }
+        /* Responsive */
+        @media (max-width: 900px) {
+            .page-wrapper { flex-direction: column; }
+            .hero-side { padding: 3rem 2rem 2rem; text-align: center; align-items: center; }
+            .hero-side::after { display: none; }
+            .hero-content { max-width: 100%; display: flex; flex-direction: column; align-items: center; }
+            .hero-tagline { max-width: 100%; text-align: center; }
+            .feature-list { align-items: flex-start; width: 100%; max-width: 340px; }
+            .hero-stats { justify-content: center; }
+            .form-side { flex: none; width: 100%; max-width: 100%; padding: 1.5rem 1.5rem 3rem; justify-content: center; }
+            .login-card { max-width: 420px; width: 100%; margin: 0 auto; }
+        }
+        @media (max-width: 480px) {
+            .hero-side { padding: 2rem 1.25rem 1.5rem; }
+            .form-side { padding: 1rem 1rem 2.5rem; }
+            .login-card { padding: 1.75rem 1.5rem; border-radius: 20px; }
+            .hero-stats { gap: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow-sphere glow-sphere--tr" aria-hidden="true"></div>
+    <div class="glow-sphere glow-sphere--bl" aria-hidden="true"></div>
+
+    <div class="page-wrapper">
+
+        <!-- HERO LEFT -->
+        <section class="hero-side" aria-label="Portal introduction">
+            <div class="hero-content">
+                <div class="hero-eyebrow">
+                    <span class="dot"></span>
+                    Client Portal
+                </div>
+                <h1 class="hero-title">
+                    Welcome<br>
+                    <span class="accent">Back.</span>
+                </h1>
+                <p class="hero-tagline">
+                    Manage your website, bookings, and customers &mdash; all from one place.
+                </p>
+                <ul class="feature-list" aria-label="Portal features">
+                    <li class="feature-item">
+                        <div class="feature-check" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="feature-text">AI-powered website updates</span>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-check" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="feature-text">Real-time booking management</span>
+                    </li>
+                    <li class="feature-item">
+                        <div class="feature-check" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <span class="feature-text">Live analytics dashboard</span>
+                    </li>
+                </ul>
+                <div class="hero-stats" aria-label="Platform stats">
+                    <div class="stat-block">
+                        <span class="stat-number">99.9%</span>
+                        <span class="stat-label">Uptime SLA</span>
+                    </div>
+                    <div class="stat-block">
+                        <span class="stat-number">&lt;2s</span>
+                        <span class="stat-label">Avg. load time</span>
+                    </div>
+                    <div class="stat-block">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">AI monitoring</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FORM RIGHT -->
+        <section class="form-side" aria-label="Login form">
+            <div class="login-card" role="main">
+
+                <div class="card-brand">
+                    <div class="card-brand-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2L4.5 13.5H11L10 22L20 10H13.5L13 2Z"/>
+                        </svg>
+                    </div>
+                    PulseSite
+                </div>
+
+                <h2 class="card-title">Your Client Portal</h2>
+                <p class="card-subtitle">Sign in to manage your online presence.</p>
+
+                <div class="alert alert--error" id="alertBox" role="alert" aria-live="polite">
+                    <span class="alert-icon">
+                        <svg viewBox="0 0 24 24" id="alertIconSvg">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                    </span>
+                    <span id="alertText">Invalid credentials. Please try again.</span>
+                </div>
+
+                <form id="loginForm" novalidate>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </span>
+                            <input type="email" id="email" name="email" class="form-input"
+                                placeholder="you@yourbusiness.com" autocomplete="email" required aria-required="true">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </span>
+                            <input type="password" id="password" name="password" class="form-input"
+                                placeholder="Enter your password" autocomplete="current-password" required aria-required="true">
+                            <button type="button" class="toggle-pass" id="togglePass" aria-label="Toggle password visibility">
+                                <svg id="eyeIcon" viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-meta">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe" name="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        Access My Dashboard
+                    </button>
+
+                </form>
+
+                <div class="view-site-row">
+                    <a href="#" id="viewSiteLink" class="view-site-link" target="_blank" rel="noopener noreferrer" aria-label="View your website">
+                        View My Website
+                        <svg viewBox="0 0 24 24">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="card-footer">
+                    <p>Need help? Contact your account manager or <a href="mailto:support@autoagency.ai">support@autoagency.ai</a></p>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        /* ── CONSTANTS ── */
+        const API_LOGIN    = '/api/client/login';
+        const loginForm    = document.getElementById('loginForm');
+        const emailInput   = document.getElementById('email');
+        const passInput    = document.getElementById('password');
+        const submitBtn    = document.getElementById('submitBtn');
+        const alertBox     = document.getElementById('alertBox');
+        const alertText    = document.getElementById('alertText');
+        const alertIconSvg = document.getElementById('alertIconSvg');
+        const togglePass   = document.getElementById('togglePass');
+        const eyeIcon      = document.getElementById('eyeIcon');
+        const viewSiteLink = document.getElementById('viewSiteLink');
+
+        /* ── AUTO-REDIRECT IF ALREADY LOGGED IN ── */
+        (function checkSession() {
+            const token    = localStorage.getItem('client_token');
+            const clientId = localStorage.getItem('client_id');
+            if (token && clientId) {
+                window.location.replace('/portal/' + clientId);
+            }
+        })();
+
+        /* ── PASSWORD TOGGLE ── */
+        const EYE_OPEN = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        const EYE_CLOSED = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        let passVisible = false;
+        togglePass.addEventListener('click', function() {
+            passVisible = !passVisible;
+            passInput.type    = passVisible ? 'text' : 'password';
+            eyeIcon.innerHTML = passVisible ? EYE_CLOSED : EYE_OPEN;
+            togglePass.setAttribute('aria-label', passVisible ? 'Hide password' : 'Show password');
+        });
+
+        /* ── ALERT HELPERS ── */
+        const ICON_ERROR   = '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>';
+        const ICON_SUCCESS = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>';
+
+        function showAlert(msg, type) {
+            type = type || 'error';
+            alertBox.className = 'alert alert--' + type;
+            alertIconSvg.innerHTML = type === 'error' ? ICON_ERROR : ICON_SUCCESS;
+            alertText.textContent = msg;
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    alertBox.classList.add('visible');
+                });
+            });
+        }
+        function hideAlert() { alertBox.classList.remove('visible'); }
+
+        /* ── LOADING STATE ── */
+        function setLoading(loading) {
+            if (loading) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span>Authenticating\u2026';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Access My Dashboard';
+            }
+        }
+
+        /* ── UPDATE VIEW MY WEBSITE LINK ── */
+        function updateViewSiteLink(clientId) {
+            if (!clientId) return;
+            viewSiteLink.href = '/client/' + clientId + '/';
+            viewSiteLink.setAttribute('aria-label', 'View website for ' + clientId);
+        }
+
+        /* ── FORM SUBMIT ── */
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            hideAlert();
+
+            var email    = emailInput.value.trim();
+            var password = passInput.value;
+
+            if (!email) { showAlert('Please enter your email address.', 'error'); emailInput.focus(); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('Please enter a valid email address.', 'error'); emailInput.focus(); return; }
+            if (!password) { showAlert('Please enter your password.', 'error'); passInput.focus(); return; }
+
+            setLoading(true);
+
+            fetch(API_LOGIN, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ email: email, password: password })
+            })
+            .then(function(response) {
+                return response.json().catch(function() { return {}; }).then(function(data) {
+                    return { ok: response.ok, status: response.status, data: data };
+                });
+            })
+            .then(function(result) {
+                if (!result.ok) {
+                    var errMsg = (result.data && (result.data.error || result.data.message)) || ('Login failed (' + result.status + '). Please try again.');
+                    showAlert(errMsg, 'error');
+                    setLoading(false);
+                    return;
+                }
+                var data     = result.data;
+                var token    = data.token    || data.access_token || '';
+                var clientId = data.clientId || data.client_id    || data.id || '';
+
+                if (!token || !clientId) {
+                    showAlert('Unexpected response from server. Please contact support.', 'error');
+                    setLoading(false);
+                    return;
+                }
+
+                localStorage.setItem('client_token', token);
+                localStorage.setItem('client_id', clientId);
+                if (document.getElementById('rememberMe').checked) {
+                    localStorage.setItem('client_email', email);
+                }
+
+                updateViewSiteLink(clientId);
+                showAlert('Login successful! Redirecting to your dashboard\u2026', 'success');
+
+                setTimeout(function() {
+                    window.location.href = '/portal/' + clientId;
+                }, 900);
+            })
+            .catch(function(err) {
+                console.error('[Client Login] Network error:', err);
+                showAlert('Unable to connect. Please check your connection and try again.', 'error');
+                setLoading(false);
+            });
+        });
+
+        /* ── PRE-FILL REMEMBERED EMAIL ── */
+        (function prefill() {
+            var saved = localStorage.getItem('client_email');
+            if (saved) {
+                emailInput.value = saved;
+                document.getElementById('rememberMe').checked = true;
+                setTimeout(function() { passInput.focus(); }, 300);
+            }
+        })();
+
+        /* ── CLEAR ERROR ON INPUT ── */
+        [emailInput, passInput].forEach(function(el) {
+            el.addEventListener('input', function() {
+                if (alertBox.classList.contains('visible') && alertBox.classList.contains('alert--error')) hideAlert();
+            });
+        });
+
+        /* ── INIT VIEW SITE LINK ── */
+        (function initLink() {
+            var id = localStorage.getItem('client_id');
+            if (id) updateViewSiteLink(id);
+        })();
+    </script>
+
+</body>
+</html>

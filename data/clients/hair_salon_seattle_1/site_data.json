@@ -1,0 +1,16 @@
+{
+  "businessName": "Emerald City Cuts Seattle",
+  "niche": "hair_salon",
+  "contact": {
+    "phone": "+1 (546) 555-4895",
+    "email": "contact@emeraldcitycutsseattle.com",
+    "address": "100 Grand Ave, Seattle, WA"
+  },
+  "services": {
+    "Luxe Conditioning Treatment": 45,
+    "Signature Haircut & Style": 95,
+    "Bang Trim & Reshape": 35,
+    "Root Retouch & Gloss": 120
+  },
+  "bookings": []
+}

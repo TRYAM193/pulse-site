@@ -1,0 +1,33 @@
+{
+  "name": "pulsesite-web-engine",
+  "version": "2.0.0",
+  "description": "PulseSite — Autonomous Local Business Site Engine & Realtime AI Updater",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "simulate": "node scratch/simulate_whatsapp.js",
+    "prospect": "node scratch/test_prospector.js",
+    "db-init": "node src/db/init.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.6.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^9.0.3",
+    "razorpay": "^2.9.8",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^6.0.1",
+    "stripe": "^22.3.2",
+    "twilio": "^4.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  }
+}

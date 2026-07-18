@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+*.env
+gcp-service-account.json
+
+# Logs & temp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+data/logs/
+
+# Build / dist
+dist/
+build/
