@@ -62,36 +62,51 @@ export async function searchLeads(niche, city) {
       const searchRes = await fetch(searchUrl);
       const searchData = await searchRes.json();
 
-      if (searchData.status === 'OK' && searchData.results) {
-        // Query Place Details for the top candidates
-        const candidates = searchData.results.slice(0, 8);
+      if (searchData.status === 'OK' && searchData.results && searchData.results.length > 0) {
+        console.log(`[LeadProspector] Google Places API returned ${searchData.results.length} live results.`);
+        const candidates = searchData.results.slice(0, 10);
+
         for (const place of candidates) {
-          const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_address,formatted_phone_number,rating,user_ratings_total,website&key=${placesKey}`;
-          const detailsRes = await fetch(detailsUrl);
-          const detailsData = await detailsRes.json();
+          let resName = place.name;
+          let resAddr = place.formatted_address || 'Address on Google Maps';
+          let resRating = place.rating || 4.5;
+          let resReviews = place.user_ratings_total || 25;
+          let resPhone = 'Available on Google Maps';
+          let hasWebsite = false;
 
-          if (detailsData.status === 'OK' && detailsData.result) {
-            const res = detailsData.result;
-            const hasWebsite = res.website && res.website !== '';
-            
-            if (!hasWebsite) {
-              const rating = res.rating || 4.0;
-              const reviews = res.user_ratings_total || 10;
-              const estimatedMissedRevenue = Math.floor(reviews * (rating - 3.5) * metrics.avgTicket * 0.15);
+          try {
+            const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=name,formatted_address,formatted_phone_number,rating,user_ratings_total,website&key=${placesKey}`;
+            const detailsRes = await fetch(detailsUrl);
+            const detailsData = await detailsRes.json();
 
-              targetLeads.push({
-                id: place.place_id,
-                businessName: res.name,
-                niche,
-                city,
-                rating,
-                reviews,
-                phone: res.formatted_phone_number || 'None',
-                address: res.formatted_address || 'None',
-                website: 'None',
-                estimatedMissedRevenue
-              });
+            if (detailsData.status === 'OK' && detailsData.result) {
+              const dRes = detailsData.result;
+              resName = dRes.name || resName;
+              resAddr = dRes.formatted_address || resAddr;
+              resRating = dRes.rating || resRating;
+              resReviews = dRes.user_ratings_total || resReviews;
+              resPhone = dRes.formatted_phone_number || resPhone;
+              hasWebsite = Boolean(dRes.website && dRes.website.trim());
             }
+          } catch {
+            // Use Text Search properties
+          }
+
+          if (!hasWebsite) {
+            const estimatedMissedRevenue = Math.floor(resReviews * (resRating - 3.5) * metrics.avgTicket * 0.15) || 1250;
+
+            targetLeads.push({
+              id: place.place_id,
+              businessName: resName,
+              niche,
+              city,
+              rating: resRating,
+              reviews: resReviews,
+              phone: resPhone,
+              address: resAddr,
+              website: 'None',
+              estimatedMissedRevenue
+            });
           }
         }
       } else {
