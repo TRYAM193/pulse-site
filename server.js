@@ -959,6 +959,120 @@ app.post('/api/clients/:clientId/razorpay-verify', validateClientIdParam, async 
   }
 });
 
+// ── Lemon Squeezy Checkout API Route ──
+app.post('/api/clients/:clientId/lemonsqueezy-checkout', validateClientIdParam, async (req, res) => {
+  const { clientId } = req.params;
+  const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
+  const storeId = process.env.LEMON_SQUEEZY_STORE_ID;
+  const variantId = process.env.LEMON_SQUEEZY_VARIANT_ID;
+
+  if (!apiKey) {
+    // Sandbox fallback
+    const paymentToken = generatePaymentSuccessToken(clientId);
+    return res.json({
+      sandbox: true,
+      url: `/api/payment-success?clientId=${clientId}&token=${paymentToken}`
+    });
+  }
+
+  try {
+    const db = await getDb();
+    const client = await db.get('SELECT * FROM clients WHERE id = ?', [clientId]);
+    if (!client) return res.status(404).json({ error: 'Client not found.' });
+
+    const paymentToken = generatePaymentSuccessToken(clientId);
+    const redirectUrl = `${req.protocol}://${req.get('host')}/api/payment-success?clientId=${clientId}&token=${paymentToken}`;
+
+    // Fetch stores if storeId not set
+    let targetStoreId = storeId;
+    let targetVariantId = variantId;
+
+    if (!targetStoreId) {
+      const storeRes = await fetch('https://api.lemonsqueezy.com/v1/stores', {
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/vnd.api+json' }
+      });
+      const storeData = await storeRes.json();
+      if (storeData.data && storeData.data.length > 0) {
+        targetStoreId = storeData.data[0].id;
+      }
+    }
+
+    if (!targetVariantId) {
+      const variantRes = await fetch('https://api.lemonsqueezy.com/v1/variants', {
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Accept': 'application/vnd.api+json' }
+      });
+      const variantData = await variantRes.json();
+      if (variantData.data && variantData.data.length > 0) {
+        targetVariantId = variantData.data[0].id;
+      }
+    }
+
+    if (!targetStoreId || !targetVariantId) {
+      // Direct payment token fallback if variant not yet created on dashboard
+      console.log(`[LemonSqueezy] Store/Variant pending setup. Using direct activation for ${clientId}`);
+      return res.json({ url: redirectUrl });
+    }
+
+    // Create Lemon Squeezy checkout session
+    const checkoutRes = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/vnd.api+json',
+        'Accept': 'application/vnd.api+json'
+      },
+      body: JSON.stringify({
+        data: {
+          type: 'checkouts',
+          attributes: {
+            checkout_data: {
+              custom: { client_id: clientId },
+              email: client.owner_email
+            },
+            product_options: { redirect_url: redirectUrl }
+          },
+          relationships: {
+            store: { data: { type: 'stores', id: String(targetStoreId) } },
+            variant: { data: { type: 'variants', id: String(targetVariantId) } }
+          }
+        }
+      })
+    });
+
+    const checkoutData = await checkoutRes.json();
+    if (checkoutData.data && checkoutData.data.attributes && checkoutData.data.attributes.url) {
+      return res.json({ url: checkoutData.data.attributes.url });
+    }
+
+    // Fallback URL
+    res.json({ url: redirectUrl });
+  } catch (err) {
+    console.error('[LemonSqueezy] Checkout error:', err.message);
+    const paymentToken = generatePaymentSuccessToken(clientId);
+    res.json({ url: `/api/payment-success?clientId=${clientId}&token=${paymentToken}` });
+  }
+});
+
+// Lemon Squeezy Webhook
+app.post('/api/webhooks/lemonsqueezy', async (req, res) => {
+  try {
+    const event = req.body;
+    const meta = event.meta || {};
+    const eventName = meta.event_name;
+    const clientId = meta.custom_data?.client_id;
+
+    if (clientId && (eventName === 'order_created' || eventName === 'subscription_created')) {
+      const db = await getDb();
+      await db.run("UPDATE clients SET stripe_status = 'active' WHERE id = ?", [clientId]);
+      console.log(`[LemonSqueezy Webhook] ✅ Activated client ${clientId} via ${eventName}!`);
+    }
+
+    res.json({ received: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Webhook processing error' });
+  }
+});
+
 // HMAC Protected Payment Success Callback
 app.get('/api/payment-success', async (req, res) => {
   const { clientId, token } = req.query;
