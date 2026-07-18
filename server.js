@@ -1211,7 +1211,99 @@ app.post('/api/clients/:clientId/bookings/:bookingId/status', validateClientIdPa
   }
 });
 
-// Stripe subscribe link creator (accessible by admin or matching client)
+let cachedLemonStoreId = null;
+let cachedLemonVariantId = null;
+
+/**
+ * Creates a checkout session via Lemon Squeezy API with auto-discovery of store and variant.
+ */
+async function getLemonSqueezyCheckout(clientId, email, redirectUrl) {
+  const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
+  if (!apiKey) throw new Error('Lemon Squeezy API key is not configured.');
+
+  // Auto-discover store ID if not cached
+  if (!cachedLemonStoreId) {
+    console.log('[LemonSqueezy] Querying stores for auto-discovery...');
+    const storeRes = await fetch('https://api.lemonsqueezy.com/v1/stores', {
+      headers: {
+        'Accept': 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json',
+        'Authorization': `Bearer ${apiKey}`
+      }
+    });
+    const storeData = await storeRes.json();
+    if (storeData.data && storeData.data.length > 0) {
+      cachedLemonStoreId = storeData.data[0].id;
+      console.log(`[LemonSqueezy] Discovered Store ID: ${cachedLemonStoreId}`);
+    } else {
+      throw new Error('No stores found in your Lemon Squeezy account.');
+    }
+  }
+
+  // Auto-discover first variant ID if not cached
+  if (!cachedLemonVariantId) {
+    console.log('[LemonSqueezy] Querying variants for auto-discovery...');
+    const variantRes = await fetch('https://api.lemonsqueezy.com/v1/variants', {
+      headers: {
+        'Accept': 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json',
+        'Authorization': `Bearer ${apiKey}`
+      }
+    });
+    const variantData = await variantRes.json();
+    if (variantData.data && variantData.data.length > 0) {
+      cachedLemonVariantId = variantData.data[0].id;
+      console.log(`[LemonSqueezy] Discovered Variant ID: ${cachedLemonVariantId}`);
+    } else {
+      throw new Error('No variants/products found in your Lemon Squeezy account.');
+    }
+  }
+
+  // Create checkout session
+  console.log(`[LemonSqueezy] Creating checkout session for store ${cachedLemonStoreId}, variant ${cachedLemonVariantId}...`);
+  const checkoutRes = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/vnd.api+json',
+      'Content-Type': 'application/vnd.api+json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      data: {
+        type: 'checkouts',
+        attributes: {
+          checkout_data: {
+            custom: {
+              clientId: clientId
+            },
+            email: email || ''
+          },
+          product_options: {
+            redirect_url: redirectUrl
+          }
+        },
+        relationships: {
+          store: {
+            data: { type: 'stores', id: String(cachedLemonStoreId) }
+          },
+          variant: {
+            data: { type: 'variants', id: String(cachedLemonVariantId) }
+          }
+        }
+      }
+    })
+  });
+
+  const checkoutData = await checkoutRes.json();
+  if (checkoutData.errors) {
+    console.error('[LemonSqueezy] Checkout error response:', JSON.stringify(checkoutData.errors));
+    throw new Error(checkoutData.errors[0].detail || 'Failed to create Lemon Squeezy checkout.');
+  }
+
+  return checkoutData.data.attributes.url;
+}
+
+// Stripe / Lemon Squeezy subscribe link creator (accessible by admin or matching client)
 app.post('/api/clients/:clientId/subscribe', validateClientIdParam, requireAdminOrClientAuth, async (req, res) => {
   const { clientId } = req.params;
 
@@ -1220,8 +1312,20 @@ app.post('/api/clients/:clientId/subscribe', validateClientIdParam, requireAdmin
     const client = await db.get('SELECT * FROM clients WHERE id = ?', [clientId]);
     if (!client) return res.status(404).json({ success: false, error: 'Client not found.' });
 
+    const lemonKey = process.env.LEMON_SQUEEZY_API_KEY;
     const stripeApiKey = process.env.STRIPE_SECRET_KEY;
     const paymentToken = generatePaymentSuccessToken(clientId);
+
+    if (lemonKey) {
+      const redirectUrl = `${req.protocol}://${req.get('host')}/api/payment-success?clientId=${clientId}&token=${paymentToken}`;
+      try {
+        const url = await getLemonSqueezyCheckout(clientId, client.owner_email, redirectUrl);
+        return res.json({ url });
+      } catch (lemonErr) {
+        console.error('[LemonSqueezy] Failed to create checkout:', lemonErr.message);
+        return res.status(500).json({ success: false, error: 'Lemon Squeezy checkout failed: ' + lemonErr.message });
+      }
+    }
 
     if (!stripeApiKey) {
       console.log(`[Stripe] Sandbox mode: Generated checkout link for ${clientId}`);
@@ -1549,8 +1653,20 @@ app.post('/api/clients/:clientId/subscribe-public', validateClientIdParam, async
     const client = await db.get('SELECT * FROM clients WHERE id = ?', [clientId]);
     if (!client) return res.status(404).json({ success: false, error: 'Client not found.' });
 
+    const lemonKey = process.env.LEMON_SQUEEZY_API_KEY;
     const stripeApiKey = process.env.STRIPE_SECRET_KEY;
     const paymentToken = generatePaymentSuccessToken(clientId);
+
+    if (lemonKey) {
+      const redirectUrl = `${req.protocol}://${req.get('host')}/api/payment-success?clientId=${clientId}&token=${paymentToken}`;
+      try {
+        const url = await getLemonSqueezyCheckout(clientId, client.owner_email, redirectUrl);
+        return res.json({ url });
+      } catch (lemonErr) {
+        console.error('[LemonSqueezy] Failed to create checkout:', lemonErr.message);
+        return res.status(500).json({ success: false, error: 'Lemon Squeezy checkout failed: ' + lemonErr.message });
+      }
+    }
 
     if (!stripeApiKey) {
       return res.json({ url: `/api/payment-success?clientId=${clientId}&token=${paymentToken}` });
