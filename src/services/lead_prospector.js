@@ -46,7 +46,9 @@ export async function searchLeads(niche, city) {
       rating: lead.rating,
       estimatedMissedRevenue: lead.lost_revenue,
       status: lead.status,
-      pitchText: lead.pitch_text
+      pitchText: lead.pitch_text,
+      email: lead.email,
+      website: lead.website
     }));
   }
 
@@ -117,48 +119,31 @@ export async function searchLeads(niche, city) {
     }
   }
 
-  // If Places API Key is missing or failed, fall back to mock templates
+  // If Places API Key is missing or failed, throw error to avoid mock data in production
   if (targetLeads.length === 0) {
-    console.log(`[LeadProspector] Using template mock data fallback.`);
-    const businessTemplates = {
-      hair_salon: ["Emerald City Cuts", "Vibe Hair Lounge", "Classic Styles", "Luxe Glow Salon", "Radiant Cuts"],
-      plumber: ["Cascade Plumbing Co.", "Rapid Rooter Bros", "Northwest Leak Fixers", "Jet Plumbers", "Reliable Pipe Techs"],
-      dentist: ["Metro Dental Care", "Family Smile Clinic", "Bright Dental", "Parkside Orthodontics", "Apex Dental Group"],
-      restaurant: ["Olive & Vine Bistro", "Grizzly Burger Bar", "Noodle Haven", "Spice Route Grill", "The Daily Grind Cafe"]
-    };
-
-    const selectedNames = businessTemplates[niche] || ["Local Service Hub", "Elite Business Pros", "Pro Active Services"];
-
-    const leads = selectedNames.map((name, index) => {
-      const rating = parseFloat((4.0 + Math.random() * 0.9).toFixed(1));
-      const reviews = Math.floor(15 + Math.random() * 120);
-      
-      const hasWebsite = index >= 3;
-      const website = hasWebsite ? `http://www.example-${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com` : 'None';
-      const estimatedMissedRevenue = Math.floor(reviews * (rating - 3.5) * metrics.avgTicket * 0.15);
-
-      return {
-        id: `${niche}_${city.toLowerCase()}_${index + 1}`,
-        businessName: `${name} ${city}`,
-        niche,
-        city,
-        rating,
-        reviews,
-        phone: `+1 (${Math.floor(200 + Math.random() * 700)}) 555-${String(Math.floor(1000 + Math.random() * 9000))}`,
-        address: `${100 + index * 45} Grand Ave, ${city}, WA`,
-        website,
-        estimatedMissedRevenue
-      };
-    });
-
-    targetLeads = leads.filter(l => l.website === 'None');
+    if (!placesKey) {
+      throw new Error('[LeadProspector] PLACES_API_KEY is missing. Real Google Places API is required in production.');
+    }
+    console.warn(`[LeadProspector] No leads found matching the criteria in ${city}.`);
+    return [];
   }
+
+  // Add outreach email generation for leads missing websites
+  targetLeads = targetLeads.map(lead => {
+    const slug = lead.businessName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const generatedEmail = `contact@${slug}.com`; // Plausible default business email
+    return {
+      ...lead,
+      email: generatedEmail,
+      website: 'None'
+    };
+  });
 
   // Insert into SQLite database
   console.log(`[LeadProspector] Caching ${targetLeads.length} target leads missing websites into SQLite...`);
   const stmt = await db.prepare(`
-    INSERT INTO leads (id, business_name, niche, city, phone, address, rating, lost_revenue, status, pitch_text)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+    INSERT INTO leads (id, business_name, niche, city, phone, address, rating, lost_revenue, status, pitch_text, email, website, campaign_status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, 'queued')
   `);
 
   for (const lead of targetLeads) {
@@ -172,7 +157,9 @@ export async function searchLeads(niche, city) {
         lead.address,
         lead.rating,
         lead.estimatedMissedRevenue,
-        'discovered'
+        'discovered',
+        lead.email,
+        lead.website
       );
     } catch (err) {
       // Catch duplicates gracefully (in case of primary key collisions)
@@ -221,7 +208,7 @@ Draft a message that:
   console.log(`[LeadProspector] Generating personalized AI audit for: ${lead.businessName || lead.business_name}`);
   
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.5-flash',
     contents: prompt,
     config: {
       temperature: 0.7

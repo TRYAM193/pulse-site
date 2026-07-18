@@ -67,12 +67,12 @@ Output JSON Schema:
     "aboutBody": "About Us Story",
     "serviceIntro": "Short intro to services"
   },
-  "services": {
-    "Service Name 1": 45,
-    "Service Name 2": 95,
-    "Service Name 3": 35,
-    "Service Name 4": 120
-  },
+  "services": [
+    { "name": "Service Name 1", "price": 45, "durationMinutes": 30 },
+    { "name": "Service Name 2", "price": 95, "durationMinutes": 60 },
+    { "name": "Service Name 3", "price": 35, "durationMinutes": 30 },
+    { "name": "Service Name 4", "price": 120, "durationMinutes": 90 }
+  ],
   "hours": {
     "Monday": "9 AM - 6 PM",
     "Tuesday": "9 AM - 6 PM",
@@ -96,7 +96,7 @@ Output JSON Schema:
 `;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.5-flash',
     contents: prompt,
     config: {
       temperature: 0.7

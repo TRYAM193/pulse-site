@@ -21,7 +21,12 @@ async function initDb() {
         rating REAL,
         lost_revenue REAL,
         status TEXT NOT NULL DEFAULT 'discovered',
-        pitch_text TEXT
+        pitch_text TEXT,
+        email TEXT,
+        website TEXT,
+        campaign_status TEXT DEFAULT 'none',
+        last_emailed_at TEXT,
+        follow_up_count INTEGER DEFAULT 0
       )
     `);
 
@@ -85,9 +90,27 @@ async function initDb() {
       )
     `);
 
+    // 6. Create email_campaigns table for Outbound Campaigns
+    console.log(`Creating table: email_campaigns...`);
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS email_campaigns (
+        id TEXT PRIMARY KEY,
+        lead_id TEXT NOT NULL,
+        email_type TEXT NOT NULL, -- 'cold_intro', 'follow_up_1', 'follow_up_2', 'follow_up_3'
+        subject TEXT NOT NULL,
+        body_html TEXT NOT NULL,
+        sent_at TEXT NOT NULL,
+        opened_at TEXT,
+        replied_at TEXT,
+        status TEXT NOT NULL DEFAULT 'sent', -- 'sent', 'opened', 'replied'
+        FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE
+      )
+    `);
+
     // Create Indexes for performance
     console.log(`Creating database indexes...`);
     await db.exec(`CREATE INDEX IF NOT EXISTS idx_leads_niche_city ON leads(niche, city)`);
+    await db.exec(`CREATE INDEX IF NOT EXISTS idx_leads_campaign ON leads(campaign_status)`);
     await db.exec(`CREATE INDEX IF NOT EXISTS idx_bookings_client ON bookings(client_id)`);
     await db.exec(`CREATE INDEX IF NOT EXISTS idx_analytics_client ON analytics(client_id)`);
     await db.exec(`CREATE INDEX IF NOT EXISTS idx_incidents_client ON incidents(client_id)`);

@@ -63,7 +63,7 @@ Output JSON Schema:
   ];
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.5-flash',
     contents: contents,
     config: {
       temperature: 0.2
@@ -77,6 +77,13 @@ Output JSON Schema:
 
   try {
     const brandProfile = JSON.parse(responseText);
+    
+    // Post-process: validate glow colors are actually bright/visible
+    if (brandProfile.colors) {
+      brandProfile.colors.primaryGlow = validateGlowColor(brandProfile.colors.primaryGlow, brandProfile.colors.bgMain, '#38bdf8');
+      brandProfile.colors.accentGlow = validateGlowColor(brandProfile.colors.accentGlow, brandProfile.colors.bgMain, '#818cf8');
+    }
+    
     console.log(`[BrandAnalyst] Successfully extracted brand profile for: ${lead.businessName}`);
     return brandProfile;
   } catch (err) {
@@ -100,4 +107,72 @@ Output JSON Schema:
       }
     };
   }
+}
+
+/**
+ * Parses a CSS color string (hex, hsl, hsla, rgba) and estimates its relative luminance.
+ * Returns a value between 0 (black) and 1 (white).
+ * @param {string} color
+ * @returns {number} Estimated luminance (0-1)
+ */
+function estimateLuminance(color) {
+  if (!color || typeof color !== 'string') return 0;
+  const c = color.trim().toLowerCase();
+
+  // Handle hex colors
+  const hexMatch = c.match(/^#([0-9a-f]{3,8})$/);
+  if (hexMatch) {
+    let hex = hexMatch[1];
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    const r = parseInt(hex.substring(0,2), 16) / 255;
+    const g = parseInt(hex.substring(2,4), 16) / 255;
+    const b = parseInt(hex.substring(4,6), 16) / 255;
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  // Handle hsl/hsla
+  const hslMatch = c.match(/hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%?\s*,\s*([\d.]+)%?/);
+  if (hslMatch) {
+    const l = parseFloat(hslMatch[3]) / 100;
+    return l; // Lightness is a decent luminance proxy for hsl
+  }
+
+  // Handle rgba
+  const rgbaMatch = c.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/);
+  if (rgbaMatch) {
+    const r = parseFloat(rgbaMatch[1]) / 255;
+    const g = parseFloat(rgbaMatch[2]) / 255;
+    const b = parseFloat(rgbaMatch[3]) / 255;
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  return 0.5; // Unknown format, assume mid-range
+}
+
+/**
+ * Validates a glow color is bright enough to be visible against a dark background.
+ * If the glow color is too dark (luminance < 0.3) or too similar to the background, 
+ * it returns the fallback color instead.
+ * @param {string} glowColor - The glow color to validate
+ * @param {string} bgColor - The background color to compare against
+ * @param {string} fallback - The fallback bright color to use
+ * @returns {string} A validated, visible glow color
+ */
+function validateGlowColor(glowColor, bgColor, fallback) {
+  const glowLum = estimateLuminance(glowColor);
+  const bgLum = estimateLuminance(bgColor);
+
+  // Glow must have luminance > 0.3 (bright enough to see)
+  if (glowLum < 0.3) {
+    console.warn(`[BrandAnalyst] Glow color "${glowColor}" is too dark (luminance: ${glowLum.toFixed(2)}). Replacing with fallback: ${fallback}`);
+    return fallback;
+  }
+
+  // Glow must differ from background by at least 0.2 luminance
+  if (Math.abs(glowLum - bgLum) < 0.2) {
+    console.warn(`[BrandAnalyst] Glow color "${glowColor}" is too similar to background "${bgColor}". Replacing with fallback: ${fallback}`);
+    return fallback;
+  }
+
+  return glowColor;
 }

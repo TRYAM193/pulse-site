@@ -1,60 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulseSite | Client Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <title>PulseSite | Executive Client Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Outfit', sans-serif;
+    :root {
+      /* BMW Carbon Black & Titanium Silver Token System */
+      --bg: #06080c;
+      --bg-radial: radial-gradient(circle at 50% 0%, #141a26 0%, #06080c 75%);
+      --sidebar-bg: rgba(12, 16, 24, 0.85);
+      --card-bg: #121722;
+      --card-hover: #192030;
+      --card-border: rgba(226, 232, 240, 0.14);
+      --card-border-glow: rgba(226, 232, 240, 0.35);
+      --text-main: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --silver-btn: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+      --silver-btn-text: #06080c;
+      --silver-glow: rgba(226, 232, 240, 0.2);
+      --accent-green: #10b981;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --shadow-pro: 0 16px 40px -10px rgba(0, 0, 0, 0.85), 0 0 1px rgba(255, 255, 255, 0.15) inset;
     }
 
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --bg-radial: radial-gradient(circle at 50% 0%, #e2e8f0 0%, #f8fafc 75%);
+      --sidebar-bg: rgba(255, 255, 255, 0.9);
+      --card-bg: #ffffff;
+      --card-hover: #f1f5f9;
+      --card-border: rgba(15, 23, 42, 0.12);
+      --card-border-glow: rgba(15, 23, 42, 0.3);
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --silver-btn: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      --silver-btn-text: #ffffff;
+      --silver-glow: rgba(15, 23, 42, 0.1);
+      --shadow-pro: 0 16px 40px -10px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.1) inset;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -ms-overflow-style: none !important; scrollbar-width: none !important; }
+    *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+    html, body { height: 100%; width: 100%; }
+
     body {
-      background-color: #080c14;
-      color: #f3f4f6;
+      background: var(--bg);
+      background-image: var(--bg-radial);
+      color: var(--text-main);
+      font-family: var(--font-body);
       display: flex;
       min-height: 100vh;
       overflow: hidden;
       position: relative;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* Gradient Background Orbs */
-    .glow-1 {
-      position: absolute;
-      top: -10%;
-      right: 10%;
-      width: 500px;
-      height: 500px;
+    /* Ambient Laser Orbs */
+    .laser-orb-1 {
+      position: absolute; top: -15%; right: 15%; width: 600px; height: 600px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
-      filter: blur(80px);
-      z-index: -1;
-      pointer-events: none;
+      background: radial-gradient(circle, rgba(226, 232, 240, 0.06) 0%, transparent 70%);
+      filter: blur(90px); pointer-events: none; z-index: 0;
     }
-
-    .glow-2 {
-      position: absolute;
-      bottom: -10%;
-      left: 10%;
-      width: 500px;
-      height: 500px;
+    .laser-orb-2 {
+      position: absolute; bottom: -15%; left: 15%; width: 600px; height: 600px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.06) 0%, transparent 70%);
-      filter: blur(80px);
-      z-index: -1;
-      pointer-events: none;
+      background: radial-gradient(circle, rgba(148, 163, 184, 0.05) 0%, transparent 70%);
+      filter: blur(90px); pointer-events: none; z-index: 0;
     }
 
-    /* Sidebar Styling */
+    /* Sidebar */
     .sidebar {
-      width: 260px;
-      background: rgba(10, 15, 28, 0.9);
-      backdrop-filter: blur(20px);
-      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      width: 270px;
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-right: 1px solid var(--card-border);
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -62,1020 +92,1077 @@
       z-index: 10;
     }
 
-    .logo-container {
+    .brand-box {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.85rem;
       margin-bottom: 2.5rem;
+      padding: 0.4rem 0.5rem;
     }
 
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: #fff;
-      font-size: 0.9rem;
-    }
-
-    .logo-text {
-      font-size: 1.25rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
     }
 
     .nav-links {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.5rem;
+      flex-grow: 1;
     }
 
     .nav-link {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 0.85rem;
-      color: #9ca3af;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      color: var(--text-secondary);
       text-decoration: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-weight: 600;
-      transition: all 0.2s ease;
+      font-size: 0.925rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
-      font-size: 0.95rem;
     }
 
     .nav-link:hover {
-      background: rgba(255, 255, 255, 0.03);
-      color: #f3f4f6;
+      background: var(--card-bg);
+      color: var(--text-main);
+      transform: translateX(2px);
     }
 
     .nav-link.active {
-      background: rgba(99, 102, 241, 0.1);
-      color: #6366f1;
-      border-left: 3px solid #6366f1;
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--card-border-glow);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
 
     .sidebar-footer {
-      margin-top: auto;
       padding-top: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      border-top: 1px solid var(--card-border);
     }
 
-    .client-info {
-      font-size: 0.85rem;
+    .client-info-box {
       margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
     }
 
     .client-biz-name {
       font-weight: 700;
-      color: #f3f4f6;
+      font-size: 0.9rem;
+      color: var(--text-main);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .client-email {
-      color: #9ca3af;
+      font-size: 0.75rem;
+      color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 0.85rem;
+    .btn-logout {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--card-border);
       color: #ef4444;
-      text-decoration: none;
+      padding: 0.75rem;
       border-radius: 10px;
       font-weight: 600;
-      transition: all 0.2s ease;
+      font-size: 0.85rem;
       cursor: pointer;
-      border: none;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
     }
 
-    .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.08);
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
     }
 
-    /* Main Content */
+    /* Main Area */
     .main-content {
       flex-grow: 1;
       height: 100vh;
       overflow-y: auto;
-      padding: 2.5rem;
+      padding: 2.5rem 3rem;
+      position: relative;
+      z-index: 1;
     }
 
-    .header-section {
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 2rem;
     }
 
-    .header-section h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+    .top-header h1 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
     }
 
-    .header-section p {
-      color: #9ca3af;
-      margin-top: 0.25rem;
+    .top-header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
     }
 
-    /* Tabs */
-    .portal-tab {
-      display: none;
-    }
-
-    .portal-tab.active {
-      display: block;
-      animation: fadeIn 0.4s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Common Card */
-    .section-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    /* Onboarding Tour Card */
+    .tour-card {
+      background: linear-gradient(135deg, rgba(226, 232, 240, 0.08) 0%, var(--card-bg) 100%);
+      border: 1px solid var(--card-border-glow);
       border-radius: 20px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      backdrop-filter: blur(10px);
+      padding: 1.75rem;
+      margin-bottom: 2.5rem;
+      backdrop-filter: blur(24px);
+      box-shadow: var(--shadow-pro);
+      transition: all 0.3s ease;
     }
 
-    .section-title {
-      font-size: 1.25rem;
-      font-weight: 700;
+    .tour-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+
+    .tour-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--card-border);
+      padding: 0.3rem 0.85rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: 0.05em;
+    }
+
+    .tour-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--card-hover);
+      border-radius: 4px;
       margin-bottom: 1.5rem;
+      overflow: hidden;
     }
 
-    /* Stats Grid */
-    .stats-grid {
+    .tour-progress-fill {
+      width: 25%;
+      height: 100%;
+      background: var(--silver-btn);
+      border-radius: 4px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tour-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1.25rem;
     }
 
-    .stat-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 20px;
-      padding: 1.5rem;
-      backdrop-filter: blur(10px);
-      border-left: 4px solid #6366f1;
+    .tour-step {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
     }
 
-    .stat-card.green { border-left-color: #10b981; }
-    .stat-card.purple { border-left-color: #a855f7; }
-
-    .stat-title {
-      font-size: 0.85rem;
-      color: #9ca3af;
-      font-weight: 600;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
+    .tour-step:hover {
+      border-color: var(--card-border-glow);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
     }
 
-    .stat-val {
-      font-size: 2rem;
+    .tour-step-num {
+      font-size: 0.75rem;
       font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .tour-step-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-main);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .tour-step-desc {
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
     }
 
     /* Buttons */
-    .btn-gradient {
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      color: #fff;
+    .btn-pro {
+      background: var(--silver-btn);
+      color: var(--silver-btn-text);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.875rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: 10px;
       border: none;
-      border-radius: 12px;
-      padding: 0.75rem 1.5rem;
-      font-size: 0.95rem;
-      font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px var(--silver-glow);
     }
 
-    .btn-gradient:hover {
+    .btn-pro:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 8px 25px var(--silver-glow);
     }
 
-    .btn-outline {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #d1d5db;
-      border-radius: 12px;
-      padding: 0.75rem 1.5rem;
-      font-size: 0.95rem;
-      font-weight: 600;
+    .btn-ghost {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
     }
 
-    .btn-outline:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.2);
+    .btn-ghost:hover {
+      border-color: var(--card-border-glow);
+      background: var(--card-hover);
+      transform: translateY(-1px);
     }
 
-    /* Table */
-    .custom-table-container {
-      overflow-x: auto;
+    /* Stat Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
     }
 
-    .custom-table {
+    .stat-card-pro {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1.75rem;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+
+    .stat-card-pro:hover {
+      border-color: var(--card-border-glow);
+      transform: translateY(-2px);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .stat-label-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .stat-val-text {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: var(--text-main);
+      letter-spacing: -0.03em;
+    }
+
+    /* Sections */
+    .card-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      backdrop-filter: blur(24px);
+    }
+
+    .card-section-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    /* Device Preview Frame Switcher */
+    .device-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.25rem;
+      background: var(--card-hover);
+      border: 1px solid var(--card-border);
+      border-radius: 14px 14px 0 0;
+    }
+
+    .device-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+
+    .device-btn.active {
+      background: var(--card-bg);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+    }
+
+    .iframe-wrapper {
+      width: 100%;
+      height: 600px;
+      background: #000;
+      border: 1px solid var(--card-border);
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      overflow: hidden;
+      margin: 0 auto;
+      transition: max-width 0.3s ease;
+    }
+
+    .iframe-wrapper.desktop { max-width: 100%; }
+    .iframe-wrapper.tablet { max-width: 768px; }
+    .iframe-wrapper.mobile { max-width: 390px; }
+
+    /* Custom Table */
+    .pro-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
     }
 
-    .custom-table th {
-      color: #9ca3af;
-      font-weight: 600;
-      font-size: 0.875rem;
+    .pro-table th {
       padding: 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .custom-table td {
-      padding: 1.25rem 1rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-      font-size: 0.95rem;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
       text-transform: uppercase;
+      border-bottom: 1px solid var(--card-border);
     }
 
-    .status-badge.approved { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-    .status-badge.pending { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-    .status-badge.rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .pro-table td {
+      padding: 1.1rem 1rem;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--card-border);
+      color: var(--text-main);
+    }
 
-    /* AI Editor Chat Styling */
-    .chat-container {
+    .pro-table tr:last-child td { border-bottom: none; }
+
+    /* AI Editor Chat Window */
+    .chat-box {
+      height: calc(100vh - 280px);
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 200px);
-      background: rgba(10, 15, 28, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      overflow: hidden;
+      justify-content: space-between;
     }
 
-    .chat-messages {
-      flex-grow: 1;
+    .chat-msg-area {
+      flex: 1;
       overflow-y: auto;
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
-    .chat-message {
-      max-width: 75%;
+    .chat-msg {
       padding: 1rem 1.25rem;
       border-radius: 16px;
-      font-size: 0.95rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      max-width: 80%;
     }
 
-    .chat-message.ai {
+    .chat-msg.ai {
+      background: var(--card-hover);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
       align-self: flex-start;
-      background: rgba(99, 102, 241, 0.1);
-      border-left: 3px solid #6366f1;
-      color: #e5e7eb;
     }
 
-    .chat-message.user {
+    .chat-msg.user {
+      background: var(--silver-btn);
+      color: var(--silver-btn-text);
       align-self: flex-end;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      color: #fff;
-    }
-
-    .chat-suggestions {
-      display: flex;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      flex-wrap: wrap;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      background: rgba(255, 255, 255, 0.01);
-    }
-
-    .suggestion-chip {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #d1d5db;
-      border-radius: 20px;
-      padding: 0.4rem 1rem;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .suggestion-chip:hover {
-      background: rgba(99, 102, 241, 0.15);
-      border-color: #6366f1;
-      color: #fff;
+      font-weight: 600;
     }
 
     .chat-input-row {
       display: flex;
-      padding: 1rem 1.5rem;
       gap: 0.75rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      background: rgba(13, 20, 35, 0.6);
+      padding: 1.25rem;
+      border-top: 1px solid var(--card-border);
+      background: var(--card-bg);
     }
 
-    .chat-input {
-      flex-grow: 1;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    .chat-text-input {
+      flex: 1;
+      background: var(--card-hover);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 0.75rem 1.25rem;
-      color: #fff;
-      font-size: 0.95rem;
+      padding: 0.85rem 1.1rem;
+      color: var(--text-main);
+      font-size: 0.9rem;
       outline: none;
-      transition: border-color 0.2s;
     }
 
-    .chat-input:focus {
-      border-color: #6366f1;
-    }
+    .chat-text-input:focus { border-color: var(--card-border-glow); }
 
-    /* Typing Indicator */
-    .typing-indicator {
-      display: flex;
-      gap: 0.25rem;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 10px;
-      width: fit-content;
-      align-self: flex-start;
-    }
-
-    .typing-dot {
-      width: 6px;
-      height: 6px;
-      background: #9ca3af;
-      border-radius: 50%;
-      animation: typing 1.4s infinite both;
-    }
-
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes typing {
-      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-      40% { transform: scale(1); opacity: 1; }
-    }
-
-    /* Iframe preview container */
-    .preview-container {
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 180px);
-    }
-
-    .preview-iframe {
-      flex-grow: 1;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      background: #fff;
-    }
-
-    /* Filters */
-    .filter-row {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .filter-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #d1d5db;
-      padding: 0.4rem 1rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .filter-btn.active {
-      background: rgba(99, 102, 241, 0.1);
-      border-color: #6366f1;
-      color: #6366f1;
-    }
-
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: rgba(16, 185, 129, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #fff;
-      padding: 1rem 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    .portal-tab { display: none; }
+    .portal-tab.active { display: block; }
   </style>
 </head>
 <body>
-  <div class="glow-1"></div>
-  <div class="glow-2"></div>
 
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="logo-container">
-      <div class="logo-icon">🤖</div>
-      <span class="logo-text" id="sidebar-logo">Client Portal</span>
+    <div class="brand-box">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="10" fill="url(#silverCardGrad)"/>
+        <rect x="0.5" y="0.5" width="31" height="31" rx="9.5" stroke="url(#silverBorderGrad)" stroke-opacity="0.4"/>
+        <path d="M6 16H10.5L13 9L17 23L20 13.5L22.5 16H26" stroke="url(#pulseLineGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+          <linearGradient id="silverCardGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#1e2433"/><stop offset="1" stop-color="#06080c"/></linearGradient>
+          <linearGradient id="silverBorderGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#475569"/></linearGradient>
+          <linearGradient id="pulseLineGrad" x1="6" y1="9" x2="26" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="#ffffff"/><stop offset="0.5" stop-color="#cbd5e1"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
+        </defs>
+      </svg>
+      <span class="brand-title">PulseSite</span>
     </div>
+
     <ul class="nav-links">
-      <li><a class="nav-link active" onclick="switchTab('dashboard')">🏠 Dashboard</a></li>
-      <li><a class="nav-link" onclick="switchTab('editor')">🤖 AI Website Editor</a></li>
-      <li><a class="nav-link" onclick="switchTab('bookings')">📅 Bookings</a></li>
-      <li><a class="nav-link" onclick="switchTab('analytics')">📊 Analytics</a></li>
-      <li><a class="nav-link" onclick="switchTab('preview')">🔗 My Website</a></li>
-      <li><a class="nav-link" onclick="switchTab('support')">🎧 AI Support Team</a></li>
+      <li><a class="nav-link active" onclick="switchTab('dashboard')"><i data-lucide="layout-dashboard" style="width:18px;"></i> Dashboard</a></li>
+      <li><a class="nav-link" onclick="switchTab('editor')"><i data-lucide="bot" style="width:18px;"></i> AI Website Editor</a></li>
+      <li><a class="nav-link" onclick="switchTab('bookings')"><i data-lucide="calendar" style="width:18px;"></i> Bookings</a></li>
+      <li><a class="nav-link" onclick="switchTab('analytics')"><i data-lucide="bar-chart-2" style="width:18px;"></i> Traffic Analytics</a></li>
+      <li><a class="nav-link" onclick="switchTab('preview')"><i data-lucide="globe" style="width:18px;"></i> Live Website</a></li>
+      <li><a class="nav-link" onclick="switchTab('domain')"><i data-lucide="link-2" style="width:18px;"></i> Custom Domain</a></li>
+      <li><a class="nav-link" onclick="switchTab('support')"><i data-lucide="headphones" style="width:18px;"></i> AI Support Team</a></li>
     </ul>
+
     <div class="sidebar-footer">
-      <div class="client-info">
+      <div class="client-info-box">
         <p class="client-biz-name" id="side-biz-name">Loading business...</p>
         <p class="client-email" id="side-owner-email">Loading email...</p>
       </div>
-      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+      <button class="btn-logout" onclick="logout()"><i data-lucide="log-out" style="width:16px;"></i> Logout</button>
     </div>
   </aside>
 
   <!-- Main Content -->
   <main class="main-content">
-    <!-- Header -->
-    <div class="header-section">
-      <h1 id="portal-greeting">Welcome back 👋</h1>
-      <p id="portal-subtitle">Manage your bookings, metrics, and AI website settings.</p>
+    <div class="top-header">
+      <div>
+        <h1 id="portal-greeting">Welcome back</h1>
+        <p id="portal-subtitle">Manage your bookings, metrics, and AI website settings.</p>
+      </div>
+      <button class="btn-ghost" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+        <i data-lucide="sun" id="theme-icon-sun" style="width:18px;"></i>
+        <i data-lucide="moon" id="theme-icon-moon" style="width:18px; display:none;"></i>
+      </button>
     </div>
 
-    <!-- ────────────────────────────────────────── -->
     <!-- TAB 1: DASHBOARD -->
-    <!-- ────────────────────────────────────────── -->
     <div id="dashboard" class="portal-tab active">
+      <!-- Onboarding Tour -->
+      <div class="tour-card" id="onboarding-tour-banner">
+        <div class="tour-header">
+          <div>
+            <div class="tour-badge"><i data-lucide="compass" style="width:14px;"></i> PROTOTYPE ONBOARDING TOUR</div>
+            <h2 style="font-size:1.4rem;font-weight:800;margin-top:0.4rem;">Welcome to Your PulseSite Portal</h2>
+            <p style="color:var(--text-secondary);font-size:0.9rem;">Your custom website prototype is compiled & live! Complete these 4 steps to launch:</p>
+          </div>
+          <button onclick="dismissOnboarding()" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;" title="Dismiss Tour">
+            <i data-lucide="x" style="width:18px;"></i>
+          </button>
+        </div>
+        <div class="tour-progress-bar"><div class="tour-progress-fill"></div></div>
+        <div class="tour-grid">
+          <div class="tour-step">
+            <div>
+              <div class="tour-step-num">STEP 1</div>
+              <div class="tour-step-title"><i data-lucide="globe" style="width:14px;"></i> Preview Prototype</div>
+              <div class="tour-step-desc">Inspect your live AI-generated website layout.</div>
+            </div>
+            <a id="tour-step-1-btn" href="#" target="_blank" class="btn-ghost" style="font-size:0.8rem;">View Site <i data-lucide="external-link" style="width:12px;"></i></a>
+          </div>
+          <div class="tour-step">
+            <div>
+              <div class="tour-step-num">STEP 2</div>
+              <div class="tour-step-title"><i data-lucide="calendar" style="width:14px;"></i> Test Booking</div>
+              <div class="tour-step-desc">Simulate an automated 30-min customer appointment.</div>
+            </div>
+            <button onclick="switchTab('bookings')" class="btn-ghost" style="font-size:0.8rem;">Manage Bookings</button>
+          </div>
+          <div class="tour-step">
+            <div>
+              <div class="tour-step-num">STEP 3</div>
+              <div class="tour-step-title"><i data-lucide="bot" style="width:14px;"></i> AI Site Editor</div>
+              <div class="tour-step-desc">Update prices or hours by typing a chat message.</div>
+            </div>
+            <button onclick="switchTab('editor')" class="btn-ghost" style="font-size:0.8rem;">Open AI Chat</button>
+          </div>
+          <div class="tour-step">
+            <div>
+              <div class="tour-step-num">STEP 4</div>
+              <div class="tour-step-title"><i data-lucide="rocket" style="width:14px;"></i> Publish Pro</div>
+              <div class="tour-step-desc">Unlock full-stack hosting & live AI editing.</div>
+            </div>
+            <button onclick="triggerUpgradeCheckout()" class="btn-pro" style="font-size:0.8rem;">Upgrade ($49/mo)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
       <div class="stats-grid">
-        <div class="stat-card">
-          <span class="stat-title">Pageviews (All-Time)</span>
-          <span class="stat-val" id="dash-pageviews">0</span>
+        <div class="stat-card-pro">
+          <div class="stat-header">
+            <span class="stat-label-text">Pageviews (All-Time)</span>
+            <i data-lucide="eye" style="width:20px;color:var(--text-muted);"></i>
+          </div>
+          <div class="stat-val-text" id="dash-pageviews">0</div>
         </div>
-        <div class="stat-card green">
-          <span class="stat-title">Bookings Recorded</span>
-          <span class="stat-val" id="dash-bookings">0</span>
+        <div class="stat-card-pro">
+          <div class="stat-header">
+            <span class="stat-label-text">Bookings Recorded</span>
+            <i data-lucide="calendar" style="width:20px;color:var(--text-muted);"></i>
+          </div>
+          <div class="stat-val-text" id="dash-bookings">0</div>
         </div>
-        <div class="stat-card purple">
-          <span class="stat-title">Conversion Rate</span>
-          <span class="stat-val" id="dash-conversion">0.0%</span>
+        <div class="stat-card-pro">
+          <div class="stat-header">
+            <span class="stat-label-text">Conversion Rate</span>
+            <i data-lucide="trending-up" style="width:20px;color:var(--text-muted);"></i>
+          </div>
+          <div class="stat-val-text" id="dash-conversion">0.0%</div>
         </div>
       </div>
 
       <!-- Quick Actions -->
-      <div class="section-card">
-        <h2 class="section-title">⚡ Quick Updates</h2>
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-          <button class="btn-gradient" onclick="switchTab('editor')">🤖 Chat with AI to update my site</button>
-          <button class="btn-outline" onclick="switchTab('bookings')">📅 Manage Customer Appointments</button>
-          <a id="dash-live-btn" href="#" target="_blank" class="btn-outline">🔗 View Live Public Website</a>
+      <div class="card-section">
+        <h2 class="card-section-title"><i data-lucide="zap" style="width:20px;"></i> Quick Updates</h2>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <button class="btn-pro" onclick="switchTab('editor')"><i data-lucide="bot" style="width:16px;"></i> Chat with AI to update my site</button>
+          <button class="btn-ghost" onclick="switchTab('bookings')"><i data-lucide="calendar" style="width:16px;"></i> Manage Customer Appointments</button>
+          <a id="dash-live-btn" href="#" target="_blank" class="btn-ghost"><i data-lucide="external-link" style="width:16px;"></i> View Live Public Website</a>
         </div>
       </div>
 
-      <!-- Recent Bookings -->
-      <div class="section-card">
-        <h2 class="section-title">📅 Recent Bookings</h2>
-        <div class="custom-table-container">
-          <table class="custom-table">
-            <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Email</th>
-                <th>Service Requested</th>
-                <th>Booking Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="dash-bookings-tbody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
+      <!-- Recent Bookings Table -->
+      <div class="card-section">
+        <h2 class="card-section-title"><i data-lucide="calendar" style="width:20px;"></i> Recent Bookings</h2>
+        <table class="pro-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Service</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="dash-bookings-table">
+            <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Loading bookings...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- ────────────────────────────────────────── -->
     <!-- TAB 2: AI WEBSITE EDITOR -->
-    <!-- ────────────────────────────────────────── -->
     <div id="editor" class="portal-tab">
-      <div class="chat-container">
-        <!-- Messages Area -->
-        <div class="chat-messages" id="chat-messages">
-          <!-- Populated by JS -->
+      <div class="card-section chat-box" style="padding:0;">
+        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--card-border);display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <h2 style="font-size:1.1rem;font-weight:800;"><i data-lucide="bot" style="width:18px;"></i> Conversational AI Site Updater</h2>
+            <p style="font-size:0.8rem;color:var(--text-muted);">Type natural instructions to update prices, hours, or services in seconds.</p>
+          </div>
         </div>
-
-        <!-- Suggestion Chips -->
-        <div class="chat-suggestions">
-          <button class="suggestion-chip" onclick="applySuggestion(this)">Update business hours</button>
-          <button class="suggestion-chip" onclick="applySuggestion(this)">Add a new service</button>
-          <button class="suggestion-chip" onclick="applySuggestion(this)">Change phone number</button>
-          <button class="suggestion-chip" onclick="applySuggestion(this)">Close Sunday hours</button>
-        </div>
-
-        <!-- Input Row -->
+        <div class="chat-msg-area" id="chat-messages"></div>
         <div class="chat-input-row">
-          <input type="text" class="chat-input" id="chat-input" placeholder="Describe the changes you want to make..." onkeydown="if(event.key==='Enter') sendChatMessage()">
-          <button class="btn-gradient" onclick="sendChatMessage()">Send Request</button>
+          <input type="text" id="chat-input" class="chat-text-input" placeholder="Type update e.g. 'Add Keratin Hair Treatment for $95'..." onkeydown="if(event.key==='Enter') sendChatMessage()" />
+          <button class="btn-pro" onclick="sendChatMessage()"><i data-lucide="send" style="width:16px;"></i> Update</button>
         </div>
       </div>
     </div>
 
-    <!-- ────────────────────────────────────────── -->
     <!-- TAB 3: BOOKINGS -->
-    <!-- ────────────────────────────────────────── -->
     <div id="bookings" class="portal-tab">
-      <div class="section-card">
-        <h2 class="section-title">📅 Client Appointments</h2>
-        
-        <div class="filter-row">
-          <button class="filter-btn active" onclick="filterBookings('all')">All</button>
-          <button class="filter-btn" onclick="filterBookings('pending')">Pending</button>
-          <button class="filter-btn" onclick="filterBookings('approved')">Approved</button>
-          <button class="filter-btn" onclick="filterBookings('rejected')">Rejected</button>
-        </div>
-
-        <div class="custom-table-container">
-          <table class="custom-table">
-            <thead>
-              <tr>
-                <th>Customer Name</th>
-                <th>Customer Email</th>
-                <th>Service Name</th>
-                <th>Booking Date</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="bookings-tbody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
+      <div class="card-section">
+        <h2 class="card-section-title"><i data-lucide="calendar" style="width:20px;"></i> Client Appointments</h2>
+        <table class="pro-table">
+          <thead>
+            <tr>
+              <th>Customer Name</th>
+              <th>Service</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="full-bookings-table">
+            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Loading appointment bookings...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- ────────────────────────────────────────── -->
     <!-- TAB 4: ANALYTICS -->
-    <!-- ────────────────────────────────────────── -->
     <div id="analytics" class="portal-tab">
-      <div class="section-card">
-        <h2 class="section-title">📊 Website Traffic Log</h2>
-        <p style="color: #9ca3af; margin-bottom: 1.5rem;">See every visit and booking transaction event tracked on your hosting domain.</p>
-
-        <div class="custom-table-container">
-          <table class="custom-table">
-            <thead>
-              <tr>
-                <th>Event Type</th>
-                <th>Timestamp</th>
-              </tr>
-            </thead>
-            <tbody id="analytics-tbody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
+      <div class="card-section">
+        <h2 class="card-section-title"><i data-lucide="bar-chart-2" style="width:20px;"></i> Website Traffic Log</h2>
+        <table class="pro-table">
+          <thead>
+            <tr>
+              <th>Event Type</th>
+              <th>IP / Visitor</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-log-table">
+            <tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Loading visitor traffic logs...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- ────────────────────────────────────────── -->
-    <!-- TAB 5: MY WEBSITE PREVIEW -->
-    <!-- ────────────────────────────────────────── -->
+    <!-- TAB 5: LIVE WEBSITE PREVIEW WITH DEVICE SWITCHER -->
     <div id="preview" class="portal-tab">
-      <div class="preview-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h2 style="font-size: 1.15rem; font-weight: 700;">Live Static Preview</h2>
-          <a id="iframe-live-url" href="#" target="_blank" class="btn-gradient" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Open Website ↗</a>
+      <div class="device-toolbar">
+        <div style="display:flex;gap:0.5rem;">
+          <button class="device-btn active" onclick="setDeviceView('desktop')"><i data-lucide="monitor" style="width:14px;"></i> Desktop</button>
+          <button class="device-btn" onclick="setDeviceView('tablet')"><i data-lucide="tablet" style="width:14px;"></i> Tablet</button>
+          <button class="device-btn" onclick="setDeviceView('mobile')"><i data-lucide="smartphone" style="width:14px;"></i> Mobile</button>
         </div>
-        <iframe id="preview-iframe" class="preview-iframe" src="about:blank"></iframe>
+        <a id="iframe-live-url" href="#" target="_blank" class="btn-pro" style="font-size:0.8rem;padding:0.4rem 0.85rem;">Open Website <i data-lucide="external-link" style="width:12px;"></i></a>
+      </div>
+      <div class="iframe-wrapper desktop" id="iframe-container">
+        <iframe id="preview-iframe" src="" style="width:100%;height:100%;border:none;"></iframe>
       </div>
     </div>
 
-    <!-- ────────────────────────────────────────── -->
-    <!-- TAB 6: AI SUPPORT TEAM & DIAGNOSTICS -->
-    <!-- ────────────────────────────────────────── -->
-    <div id="support" class="portal-tab">
-      <div class="section-card">
-        <h2 class="section-title">🎧 AI Support Team & Emergency Center</h2>
-        <p style="color: #9ca3af; margin-bottom: 1.5rem;">Report an issue or ask technical questions. Serious issues trigger an automated alert to senior engineering.</p>
-
-        <div class="chat-container" style="height: 480px; display: flex; flex-direction: column;">
-          <div class="chat-messages" id="support-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem;">
-            <div class="chat-message ai">
-              👋 Hi! I am your 24/7 AI Technical Support & Incident Response Agent. Describe any issue or question below.
+    <!-- TAB 7: CUSTOM DOMAIN -->
+    <div id="domain" class="portal-tab">
+      <div class="card-section">
+        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--card-border);">
+          <h2 style="font-size:1.1rem;font-weight:800;"><i data-lucide="link-2" style="width:18px; vertical-align:middle; margin-right:4px;"></i> Connect Custom Domain</h2>
+          <p style="font-size:0.8rem;color:var(--text-muted);">Map your personal domain name (e.g., yourbusiness.com) to your generated website.</p>
+        </div>
+        
+        <div style="padding:1.5rem; max-width:600px;">
+          <div style="display:flex; gap:12px; margin-bottom:1.5rem;">
+            <input type="text" id="domain-input" class="chat-text-input" placeholder="e.g. yourbusiness.com" style="flex:1; border: 1px solid var(--card-border);" />
+            <button class="btn-pro" onclick="saveCustomDomain()">Connect Domain</button>
+          </div>
+          
+          <div id="domain-dns-instructions" style="display:none; padding:1.5rem; background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:12px; margin-bottom:1.5rem;">
+            <h4 style="font-weight:600; margin-bottom:1rem; color:var(--text-main); font-size:0.95rem;">DNS Configuration Instructions</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">To complete the connection, configure these DNS records in your domain registrar (e.g. GoDaddy, Namecheap):</p>
+            
+            <table class="pro-table" style="font-size:0.8rem; width:100%; border-collapse:collapse; margin-bottom:1rem;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--card-border);">
+                  <th style="text-align:left; padding:8px;">Type</th>
+                  <th style="text-align:left; padding:8px;">Name/Host</th>
+                  <th style="text-align:left; padding:8px;">Value/Target</th>
+                  <th style="text-align:left; padding:8px;">TTL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--card-border);">
+                  <td style="font-family:monospace; font-weight:bold; padding:8px;">A</td>
+                  <td style="font-family:monospace; padding:8px;">@</td>
+                  <td style="font-family:monospace; padding:8px;">76.76.21.21</td>
+                  <td style="padding:8px; color:var(--text-muted);">Automatic</td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--card-border);">
+                  <td style="font-family:monospace; font-weight:bold; padding:8px;">CNAME</td>
+                  <td style="font-family:monospace; padding:8px;">www</td>
+                  <td style="font-family:monospace; padding:8px;" id="dns-cname-value">cname.autoagency.app</td>
+                  <td style="padding:8px; color:var(--text-muted);">Automatic</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div style="padding:0.8rem; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.15); border-radius:8px; display:flex; align-items:center; gap:8px;">
+              <i data-lucide="check-circle" style="color:#10b981; width:16px;"></i>
+              <span style="font-size:0.8rem; color:#10b981;">DNS changes can take up to 24-48 hours to propagate globally.</span>
             </div>
           </div>
-          <div class="chat-input-row" style="display: flex; gap: 0.8rem;">
-            <input type="text" class="chat-input" id="support-input" placeholder="Describe the issue or ask a question..." style="flex: 1;" onkeydown="if(event.key==='Enter') sendSupportMessage()">
-            <button class="btn-gradient" onclick="sendSupportMessage()">Submit Ticket</button>
+
+          <div id="domain-status-box" style="display:none; padding:1rem; border-radius:8px; font-size:0.85rem; margin-bottom:1.5rem;">
+            <!-- Dynamic status -->
           </div>
+          
+          <button class="btn-ghost" id="btn-disconnect-domain" onclick="disconnectDomain()" style="display:none; color:#ef4444; border-color:rgba(239,68,68,0.2); font-size:0.85rem; padding:0.5rem 1rem;"><i data-lucide="trash-2" style="width:14px; vertical-align:middle; margin-right:4px;"></i> Disconnect Domain</button>
         </div>
       </div>
     </div>
+
+    <!-- TAB 6: SUPPORT -->
+    <div id="support" class="portal-tab">
+      <div class="card-section chat-box" style="padding:0;">
+        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--card-border);">
+          <h2 style="font-size:1.1rem;font-weight:800;"><i data-lucide="headphones" style="width:18px;"></i> AI Technical Support & Incident Response</h2>
+          <p style="font-size:0.8rem;color:var(--text-muted);">24/7 Support Assistant. Urgent bugs escalate to senior engineering automatically.</p>
+        </div>
+        <div class="chat-msg-area" id="support-messages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="support-input" class="chat-text-input" placeholder="Type support question or error report..." onkeydown="if(event.key==='Enter') sendSupportMessage()" />
+          <button class="btn-pro" onclick="sendSupportMessage()"><i data-lucide="send" style="width:16px;"></i> Send Ticket</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
-  <!-- Success Toast -->
-  <div class="toast" id="success-toast">
-    Website updated successfully! 🎉
-  </div>
-
-  <!-- Client-side Logic -->
   <script>
-    // Extract clientId from URL pathname: /portal/:clientId
-    const clientId = window.location.pathname.split('/').filter(Boolean).pop();
-    const token = localStorage.getItem('client_token');
+    const clientId = window.location.pathname.split('/')[2];
+    let clientToken = localStorage.getItem('client_token');
 
-    // Security check
-    if (!token) {
-      window.location.href = '/client-login';
+    lucide.createIcons();
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('pulsesite_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcons(savedTheme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('pulsesite_theme', newTheme);
+      updateThemeIcons(newTheme);
+    }
+
+    function updateThemeIcons(theme) {
+      const sun = document.getElementById('theme-icon-sun');
+      const moon = document.getElementById('theme-icon-moon');
+      if (sun && moon) {
+        sun.style.display = theme === 'dark' ? 'inline-block' : 'none';
+        moon.style.display = theme === 'dark' ? 'none' : 'inline-block';
+      }
+    }
+
+    initTheme();
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.portal-tab').forEach(el => el.classList.remove('active'));
+
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) targetTab.classList.add('active');
+
+      const activeNav = Array.from(document.querySelectorAll('.nav-link')).find(el => el.getAttribute('onclick')?.includes(tabId));
+      if (activeNav) activeNav.classList.add('active');
+
+      if (tabId === 'preview') {
+        const inputVal = document.getElementById('domain-input').value.trim();
+        document.getElementById('preview-iframe').src = inputVal ? 'http://' + inputVal : '/client/' + clientId + '/';
+      }
+    }
+
+    function setDeviceView(mode) {
+      document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.device-btn')).find(b => b.getAttribute('onclick')?.includes(mode));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const wrapper = document.getElementById('iframe-container');
+      wrapper.className = 'iframe-wrapper ' + mode;
+    }
+
+    function dismissOnboarding() {
+      const banner = document.getElementById('onboarding-tour-banner');
+      if (banner) banner.style.display = 'none';
+      localStorage.setItem('onboarding_dismissed_' + clientId, 'true');
+    }
+
+    if (localStorage.getItem('onboarding_dismissed_' + clientId) === 'true') {
+      const banner = document.getElementById('onboarding-tour-banner');
+      if (banner) banner.style.display = 'none';
     }
 
     async function apiFetch(url, options = {}) {
-      options.headers = {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
+      options.headers = options.headers || {};
+      if (clientToken) options.headers['Authorization'] = 'Bearer ' + clientToken;
       const res = await fetch(url, options);
       if (res.status === 401) {
-        localStorage.removeItem('client_token');
+        localStorage.clear();
         window.location.href = '/client-login';
-        throw new Error('Unauthorized');
       }
       return res;
     }
 
-    // Load profile
     async function loadProfile() {
       try {
-        const res = await apiFetch(`/api/portal/${clientId}/me`);
+        const res = await apiFetch('/api/portal/' + clientId + '/me');
         const data = await res.json();
-        
-        document.getElementById('portal-greeting').innerText = `Welcome back, ${data.businessName} 👋`;
-        document.getElementById('side-biz-name').innerText = data.businessName;
-        document.getElementById('side-owner-email').innerText = data.ownerEmail;
-        const liveUrl = `/client/${clientId}/`;
-        document.getElementById('dash-live-btn').href = liveUrl;
-        document.getElementById('iframe-live-url').href = liveUrl;
+        document.getElementById('portal-greeting').innerText = 'Welcome back, ' + data.business_name;
+        document.getElementById('side-biz-name').innerText = data.business_name;
+        document.getElementById('side-owner-email').innerText = data.owner_email;
 
-        // Show plan badge
-        const isTrial = data.stripe_status === 'trial';
-        const badgeHtml = isTrial 
-          ? `<span style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:700;margin-left:0.5rem;">TRIAL PREVIEW</span>` 
-          : `<span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:700;margin-left:0.5rem;">PRO ACTIVE</span>`;
-        document.getElementById('side-biz-name').innerHTML += badgeHtml;
-      } catch (err) {
-        console.error(err);
-      }
-    }
+        // Set dynamic DNS instruction CNAME target based on dashboard domain
+        const cnameVal = document.getElementById('dns-cname-value');
+        if (cnameVal) cnameVal.innerText = window.location.hostname;
 
-    // Switch tab
-    function switchTab(tabId) {
-      document.querySelectorAll('.portal-tab').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-
-      document.getElementById(tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
-
-      if (tabId === 'dashboard') loadDashboard();
-      if (tabId === 'bookings') filterBookings('all');
-      if (tabId === 'analytics') loadAnalytics();
-      if (tabId === 'preview') {
-        document.getElementById('preview-iframe').src = `/client/${clientId}/`;
-      }
-    }
-
-    // Load Dashboard stats
-    async function loadDashboard() {
-      try {
-        const res = await apiFetch(`/api/portal/${clientId}/dashboard`);
-        const data = await res.json();
-
-        document.getElementById('dash-pageviews').innerText = data.metrics.pageviews;
-        document.getElementById('dash-bookings').innerText = data.metrics.bookings;
-        document.getElementById('dash-conversion').innerText = `${data.metrics.conversionRate}%`;
-
-        // Load recent bookings table
-        const tbody = document.getElementById('dash-bookings-tbody');
-        if (data.recentBookings.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #9ca3af;">No appointments scheduled yet.</td></tr>`;
-          return;
+        // Render custom domain configuration state
+        if (data.custom_domain) {
+          document.getElementById('domain-input').value = data.custom_domain;
+          document.getElementById('domain-dns-instructions').style.display = 'block';
+          document.getElementById('btn-disconnect-domain').style.display = 'inline-block';
+          
+          const statusBox = document.getElementById('domain-status-box');
+          statusBox.style.display = 'block';
+          statusBox.style.background = 'rgba(16,185,129,0.08)';
+          statusBox.style.border = '1px solid rgba(16,185,129,0.15)';
+          statusBox.style.color = '#10b981';
+          statusBox.innerHTML = `<i data-lucide="check-circle" style="width:16px; vertical-align:middle; margin-right:4px; display:inline-block;"></i> Custom domain linked: <a href="http://${data.custom_domain}" target="_blank" style="color:#10b981; font-weight:bold; text-decoration:underline;">https://${data.custom_domain}</a>`;
+          
+          const liveUrl = 'http://' + data.custom_domain;
+          document.getElementById('dash-live-btn').href = liveUrl;
+          document.getElementById('tour-step-1-btn').href = liveUrl;
+          document.getElementById('iframe-live-url').href = liveUrl;
+        } else {
+          document.getElementById('domain-input').value = '';
+          document.getElementById('domain-dns-instructions').style.display = 'none';
+          document.getElementById('btn-disconnect-domain').style.display = 'none';
+          document.getElementById('domain-status-box').style.display = 'none';
+          
+          const liveUrl = '/client/' + clientId + '/';
+          document.getElementById('dash-live-btn').href = liveUrl;
+          document.getElementById('tour-step-1-btn').href = liveUrl;
+          document.getElementById('iframe-live-url').href = liveUrl;
         }
-
-        tbody.innerHTML = data.recentBookings.map(b => {
-          const date = new Date(b.booking_date).toLocaleDateString();
-          const dateStr = b.confirmed_slot ? `${date}<br><span style="color:#10b981;font-size:0.75rem;font-weight:700;">⏰ ${b.confirmed_slot}</span>` : date;
-          return `
-            <tr>
-              <td><strong>${b.customer_name}</strong></td>
-              <td>${b.customer_email}</td>
-              <td>${b.service_name}</td>
-              <td>${dateStr}</td>
-              <td><span class="status-badge ${b.status}">${b.status}</span></td>
-            </tr>
-          `;
-        }).join('');
+        lucide.createIcons();
       } catch (err) {
-        console.error(err);
+        console.error('Failed to load client profile:', err);
       }
     }
 
-    // Booking filter
-    let activeFilter = 'all';
-    async function filterBookings(status) {
-      activeFilter = status;
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      if (event && event.currentTarget) {
-        event.currentTarget.classList.add('active');
+    async function saveCustomDomain() {
+      const domainInput = document.getElementById('domain-input').value.trim();
+      if (!domainInput) {
+        alert('Please enter a domain name.');
+        return;
       }
-
-      const tbody = document.getElementById('bookings-tbody');
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af;">Loading bookings...</td></tr>`;
-
       try {
-        const url = `/api/portal/${clientId}/bookings${status !== 'all' ? `?status=${status}` : ''}`;
-        const res = await apiFetch(url);
-        const bookings = await res.json();
-
-        if (bookings.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af;">No bookings found.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = bookings.map(b => {
-          let actions = `<span class="status-badge ${b.status}">${b.status}</span>`;
-          if (b.status === 'pending') {
-            actions = `
-              <div style="display: flex; gap: 0.5rem;">
-                <button class="btn-gradient" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="updateBookingStatus('${b.id}', 'approved')">Approve</button>
-                <button class="btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; color: #ef4444;" onclick="updateBookingStatus('${b.id}', 'rejected')">Reject</button>
-              </div>
-            `;
-          }
-          const date = new Date(b.booking_date).toLocaleDateString();
-          const dateStr = b.confirmed_slot ? `${date}<br><span style="color:#10b981;font-size:0.75rem;font-weight:700;">⏰ ${b.confirmed_slot}</span>` : date;
-          return `
-            <tr>
-              <td><strong>${b.customer_name}</strong></td>
-              <td>${b.customer_email}</td>
-              <td>${b.service_name}</td>
-              <td>${dateStr}</td>
-              <td><span class="status-badge ${b.status}">${b.status}</span></td>
-              <td>${actions}</td>
-            </tr>
-          `;
-        }).join('');
-      } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444;">Error loading bookings.</td></tr>`;
-      }
-    }
-
-    async function updateBookingStatus(bookingId, status) {
-      try {
-        const res = await apiFetch(`/api/portal/${clientId}/bookings/${bookingId}/status`, {
+        const res = await apiFetch('/api/portal/' + clientId + '/domain', {
           method: 'POST',
-          body: JSON.stringify({ status })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customDomain: domainInput })
         });
         const data = await res.json();
         if (res.ok) {
-          filterBookings(activeFilter);
-        } else if (data.isTrial) {
-          alert(data.message || "🔒 Subscription required to approve or reject customer bookings.");
+          alert('Custom domain linked successfully! Complete the DNS configurations.');
+          loadProfile();
         } else {
-          alert(data.error || "Failed to update booking status.");
+          alert('Error: ' + (data.error || 'Failed to update domain'));
         }
-      } catch {
-        alert("Failed to update status on server.");
+      } catch (err) {
+        console.error(err);
+        alert('Network error linking domain.');
       }
     }
 
-    // Load Analytics
-    async function loadAnalytics() {
-      const tbody = document.getElementById('analytics-tbody');
-      tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: #9ca3af;">Loading log...</td></tr>`;
-
+    async function disconnectDomain() {
+      if (!confirm('Are you sure you want to disconnect your custom domain? This will stop serving your site at that domain.')) return;
       try {
-        const res = await apiFetch(`/api/portal/${clientId}/analytics`);
+        const res = await apiFetch('/api/portal/' + clientId + '/domain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customDomain: '' })
+        });
+        if (res.ok) {
+          alert('Custom domain disconnected.');
+          loadProfile();
+        } else {
+          const data = await res.json();
+          alert('Error: ' + (data.error || 'Failed to disconnect domain'));
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Network error disconnecting domain.');
+      }
+    }
+
+    async function loadDashboard() {
+      try {
+        const res = await apiFetch('/api/portal/' + clientId + '/dashboard');
         const data = await res.json();
 
-        if (data.events.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: #9ca3af;">No traffic logged.</td></tr>`;
+        document.getElementById('dash-pageviews').innerText = data.metrics.pageviews || 0;
+        document.getElementById('dash-bookings').innerText = data.metrics.bookings || 0;
+
+        const conv = data.metrics.pageviews ? ((data.metrics.bookings / data.metrics.pageviews) * 100).toFixed(1) : '0.0';
+        document.getElementById('dash-conversion').innerText = conv + '%';
+
+        const tbody = document.getElementById('dash-bookings-table');
+        const fullBody = document.getElementById('full-bookings-table');
+
+        if (!data.recentBookings || data.recentBookings.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No bookings recorded yet.</td></tr>';
+          fullBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No bookings recorded yet.</td></tr>';
           return;
         }
 
-        tbody.innerHTML = data.events.map(e => {
-          const typeLabel = e.event_type === 'pageview' ? 'Page View Event' : 'Completed Appointment Booking';
-          return `
-            <tr>
-              <td><strong>${typeLabel}</strong></td>
-              <td>${new Date(e.timestamp).toLocaleString()}</td>
-            </tr>
-          `;
-        }).join('');
-      } catch {
-        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: #ef4444;">Error loading log.</td></tr>`;
+        const rowsHtml = data.recentBookings.map(b => `
+          <tr>
+            <td><strong>${b.customer_name}</strong><br><small style="color:var(--text-muted);">${b.customer_email}</small></td>
+            <td>${b.service_name || 'Standard'}</td>
+            <td>${new Date(b.booking_date).toLocaleString()}</td>
+            <td><span style="padding:0.25rem 0.65rem;border-radius:6px;font-size:0.75rem;font-weight:700;background:rgba(16,185,129,0.15);color:#10b981;">${b.status}</span></td>
+          </tr>
+        `).join('');
+
+        tbody.innerHTML = rowsHtml;
+      } catch (err) {
+        console.error('Failed to load dashboard:', err);
       }
     }
 
-    // AI Chat Editor
-    const chatMessages = document.getElementById('chat-messages');
-
-    function formatMarkdown(text) {
-      if (!text) return '';
-      // Escape HTML to prevent XSS
-      let html = text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      
-      // Format bold **text**
-      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      
-      // Format bullet points
-      html = html.replace(/^\s*[-*]\s+(.+)$/gm, '• $1');
-      
-      // Format line breaks
-      html = html.replace(/\n/g, '<br>');
-      
-      return html;
-    }
-
-    function addMessage(sender, text) {
-      const bubble = document.createElement('div');
-      bubble.classList.add('chat-message', sender);
-      bubble.innerHTML = formatMarkdown(text);
-      chatMessages.appendChild(bubble);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function showTypingIndicator() {
-      const indicator = document.createElement('div');
-      indicator.id = 'typing-indicator';
-      indicator.classList.add('typing-indicator');
-      indicator.innerHTML = `
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-      `;
-      chatMessages.appendChild(indicator);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function removeTypingIndicator() {
-      const indicator = document.getElementById('typing-indicator');
-      if (indicator) indicator.remove();
-    }
-
-    // Setup initial greeting
-    addMessage('ai', "Hi! I'm your AutoAgency AI assistant 👋 I can update your website instantly just by you describing what you want to change. Try saying something like \"Change the price of Classic Haircut to $45\" or \"Add a new service Premium Facial for $65\".");
-
-    async function sendChatMessage(overrideText = null) {
+    async function sendChatMessage() {
       const input = document.getElementById('chat-input');
-      const text = overrideText || input.value.trim();
+      const text = input.value.trim();
       if (!text) return;
 
-      if (!overrideText) input.value = '';
+      input.value = '';
+      const area = document.getElementById('chat-messages');
 
-      addMessage('user', text);
-      showTypingIndicator();
+      const userBubble = document.createElement('div');
+      userBubble.className = 'chat-msg user';
+      userBubble.innerText = text;
+      area.appendChild(userBubble);
+
+      const aiBubble = document.createElement('div');
+      aiBubble.className = 'chat-msg ai';
+      aiBubble.innerText = 'Updating live website code via Gemini 3.5...';
+      area.appendChild(aiBubble);
+      area.scrollTop = area.scrollHeight;
 
       try {
-        const res = await apiFetch(`/api/portal/${clientId}/chat`, {
+        const res = await apiFetch('/api/portal/' + clientId + '/chat', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text })
         });
         const data = await res.json();
-        
-        removeTypingIndicator();
-
-        if (res.status === 403 || data.isTrial) {
-          addMessage('ai', data.message || "🔒 **Trial Preview Mode**: The AI Editor is locked during your 14-day free preview. Upgrade to Pro ($49/month) to enable live site updates and AI compilation.");
+        if (res.ok && data.success !== false) {
+          aiBubble.innerText = data.reply || 'Website re-compiled and updated successfully!';
         } else {
-          addMessage('ai', data.reply || "Done!");
+          aiBubble.innerText = data.reply || data.message || data.error || 'Failed to execute site update.';
         }
-
-      } catch {
-        removeTypingIndicator();
-        addMessage('ai', "⚠️ Server timeout or network error. Please try again.");
+      } catch (err) {
+        aiBubble.innerText = 'Failed to execute site update. Please try again.';
       }
     }
 
-    // Support Chat JS
     async function sendSupportMessage() {
       const input = document.getElementById('support-input');
       const text = input.value.trim();
       if (!text) return;
 
       input.value = '';
-      const container = document.getElementById('support-messages');
+      const area = document.getElementById('support-messages');
 
       const userBubble = document.createElement('div');
-      userBubble.className = 'chat-message user';
-      userBubble.textContent = text;
-      container.appendChild(userBubble);
+      userBubble.className = 'chat-msg user';
+      userBubble.innerText = text;
+      area.appendChild(userBubble);
+
+      const aiBubble = document.createElement('div');
+      aiBubble.className = 'chat-msg ai';
+      aiBubble.innerText = 'Analyzing inquiry...';
+      area.appendChild(aiBubble);
+      area.scrollTop = area.scrollHeight;
 
       try {
-        const res = await apiFetch(`/api/portal/${clientId}/support`, {
+        const res = await apiFetch('/api/portal/' + clientId + '/support', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text })
         });
         const data = await res.json();
-
-        const aiBubble = document.createElement('div');
-        aiBubble.className = 'chat-message ai';
-        
-        let replyText = data.reply || "Your ticket has been registered.";
-        if (data.isUrgent) {
-          replyText += "\n\n🚨 **High Severity Alert Dispatched**: An urgent notification has been sent to senior engineering (`shreyaskumarswamy2007@gmail.com`).";
-        }
-        aiBubble.innerHTML = formatMarkdown(replyText);
-        container.appendChild(aiBubble);
-        container.scrollTop = container.scrollHeight;
-      } catch {
-        const aiBubble = document.createElement('div');
-        aiBubble.className = 'chat-message ai';
-        aiBubble.textContent = "⚠️ Unable to submit ticket. Please check server status.";
-        container.appendChild(aiBubble);
+        aiBubble.innerText = data.reply || 'Ticket logged. Support agent has processed your inquiry.';
+      } catch (err) {
+        aiBubble.innerText = 'Support service unavailable.';
       }
     }
 
-    function applySuggestion(btn) {
-      const text = btn.innerText;
-      let promptText = "";
-      if (text.includes("hours")) promptText = "Update my business hours to Monday-Friday 9am-7pm, Saturday 10am-5pm, Sunday Closed.";
-      if (text.includes("service")) promptText = "Add a new service: Deep Tissue Massage for $85 duration 60 minutes.";
-      if (text.includes("phone")) promptText = "Change our customer contact phone number to (555) 987-6543.";
-      if (text.includes("Sunday")) promptText = "Change Sunday business hours to Closed.";
-
-      sendChatMessage(promptText);
+    function triggerUpgradeCheckout() {
+      apiFetch('/api/clients/' + clientId + '/subscribe', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.checkoutUrl) window.location.href = data.checkoutUrl;
+          else alert('Subscription activated successfully!');
+        })
+        .catch(() => alert('Subscription checkout service initialized.'));
     }
 
-    function showToast() {
-      const toast = document.getElementById('success-toast');
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 4000);
-    }
-
-    // Logout
-    async function logout() {
-      await fetch('/api/client/logout', { method: 'POST' });
+    function logout() {
       localStorage.clear();
       window.location.href = '/client-login';
     }
 
-    // Initial load
     loadProfile();
     loadDashboard();
   </script>

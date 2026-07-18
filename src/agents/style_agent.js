@@ -24,26 +24,30 @@ Requirements:
      - \`--bg-main\`: ${brief.colors.bgMain}
      - \`--card-bg\`: ${brief.colors.cardBg}
      - \`--border-color\`: ${brief.colors.borderColor}
-     - \`--primary-glow\`: ${brief.colors.primaryGlow}
-     - \`--accent-glow\`: ${brief.colors.accentGlow}
+     - \`--primary-glow\`: ${brief.colors.primaryGlow}  ← MUST be a bright, vivid, visible color (e.g. #38bdf8, #6366f1, #a78bfa). NOT a dark slate or near-black color.
+     - \`--accent-glow\`: ${brief.colors.accentGlow}  ← MUST be a bright accent color (e.g. #a855f7, #fb7185, #34d399). NOT a dark slate or near-black color.
      - \`--text-main\`: ${brief.colors.textMain}
      - \`--text-muted\`: ${brief.colors.textMuted}
      - \`--header-font\`: "${brief.fontPairing.headerFont}", sans-serif;
      - \`--body-font\`: "${brief.fontPairing.bodyFont}", sans-serif;
-2. **Ambient Animations & Spheres:**
+2. **Hide All Scrollbars:**
+   - Add these rules globally so no scrollbar is ever visible:
+     \`* { scrollbar-width: none; -ms-overflow-style: none; }\`
+     \`*::-webkit-scrollbar { display: none; }\`
+3. **Ambient Animations & Spheres:**
    - Write style rules for \`.glow-sphere\` class. They must be fixed background elements with a heavy blur (150px-200px), a low opacity (0.15-0.25), and a smooth drifting keyframe animation.
    - Define \`@keyframes drift\` to translate and rotate spheres in the background over 20-30 seconds.
-3. **Glassmorphism & Component styling:**
+4. **Glassmorphism & Component styling:**
    - Write custom definitions for glassmorphic cards (\`backdrop-filter: blur(12px)\`, custom borders using \`var(--border-color)\`).
-   - Add responsive grid gap stylings, custom scrollbar tracks, and styled selections.
+   - Add responsive grid gap stylings, and styled selections.
    - Ensure the styles mesh perfectly with Tailwind v4 utilities.
-4. **Quality Rules:**
+5. **Quality Rules:**
    - Write the complete CSS code. Do NOT truncate or use placeholders.
    - Return ONLY the raw CSS string. Do NOT wrap it in markdown code blocks.
 `;
 
   const response = await generateContentWithRetry({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.5-flash',
     contents: prompt,
     config: {
       temperature: 0.2

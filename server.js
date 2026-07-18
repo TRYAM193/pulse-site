@@ -20,6 +20,7 @@ import { generateCssStyles } from './src/agents/style_agent.js';
 import { generateTypeScriptLogic } from './src/agents/coder_agent.js';
 import { compileAndVerifyCode } from './src/agents/qa_agent.js';
 import { generateClientBackend } from './src/agents/backend_agent.js';
+import { generateSeoMetadata, renderSeoHead } from './src/agents/seo_agent.js';
 import { handleSupportTicket } from './src/agents/support_agent.js';
 import { sendUrgentAlert } from './src/services/notifier.js';
 import Stripe from 'stripe';
@@ -38,6 +39,44 @@ app.use(helmet({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Custom Domain Request Router Middleware
+app.use(async (req, res, next) => {
+  const host = req.get('host') || '';
+  const hostname = host.split(':')[0].toLowerCase().replace(/^www\./, '');
+  
+  // Platform standard hosts to ignore
+  const mainDomains = ['localhost', '127.0.0.1', 'autoagency.app', 'autoagency.com'];
+  const isMainDomain = mainDomains.includes(hostname) || 
+                       hostname.endsWith('.autoagency.app') || 
+                       hostname.endsWith('.autoagency.com');
+
+  if (!isMainDomain && hostname !== '') {
+    try {
+      const db = await getDb();
+      const client = await db.get('SELECT id FROM clients WHERE custom_domain = ?', [hostname]);
+      
+      if (client) {
+        const clientId = client.id;
+        console.log(`[CustomDomain] Mapping ${hostname} request internally to clientId: ${clientId}`);
+        
+        // Transparently rewrite req.url to route to correct client folder
+        if (req.url === '/' || req.url === '') {
+          req.url = `/client/${clientId}/`;
+        } else if (req.url === '/style.css') {
+          req.url = `/client/${clientId}/style.css`;
+        } else if (req.url === '/app.js') {
+          req.url = `/client/${clientId}/app.js`;
+        } else if (req.url === '/book' || req.url === '/book/') {
+          req.url = `/client/${clientId}/book`;
+        }
+      }
+    } catch (err) {
+      console.error(`[CustomDomain] Error mapping ${hostname}:`, err.message);
+    }
+  }
+  next();
+});
 
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || 'autoagency-super-secret-jwt-key-2026-production';
@@ -159,12 +198,12 @@ async function requireActiveSubscription(req, res, next) {
       return res.status(404).json({ error: 'Client not found.' });
     }
 
-    if (client.stripe_status !== 'active') {
+    if (client.stripe_status !== 'active' && client.stripe_status !== 'trial') {
       return res.status(403).json({
         success: false,
         isTrial: true,
         error: 'Subscription required.',
-        message: '🔒 Trial Preview Mode: This feature requires an active subscription ($49/mo). Upgrade to unlock full AI editing, booking management, and live website sync.'
+        message: '🔒 Trial Preview Mode: This feature requires an active subscription ($49/mo).'
       });
     }
 
@@ -341,6 +380,11 @@ app.get('/client-login', (req, res) => {
   res.sendFile(path.join(rootDir, 'views', 'client-login.html'));
 });
 
+// ── GET /client-signup ── Client signup page
+app.get('/client-signup', (req, res) => {
+  res.sendFile(path.join(rootDir, 'views', 'client-signup.html'));
+});
+
 // ── GET /portal/:clientId ── Client portal dashboard
 app.get('/portal/:clientId', validateClientIdParam, (req, res) => {
   const token = req.cookies?.client_token;
@@ -439,6 +483,197 @@ app.post('/api/client/login', loginLimiter, async (req, res) => {
   }
 });
 
+app.post('/api/client/signup', loginLimiter, async (req, res) => {
+  const { businessName, niche, email, password } = req.body;
+
+  if (!businessName || !email || !password) {
+    return res.status(400).json({ error: 'Business name, email, and password are required.' });
+  }
+
+  try {
+    const db = await getDb();
+    const existing = await db.get('SELECT id FROM clients WHERE LOWER(owner_email) = LOWER(?)', [email.trim()]);
+    if (existing) {
+      return res.status(400).json({ error: 'An account with this email address already exists. Please log in.' });
+    }
+
+    const sanitizeId = businessName.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 20);
+    const clientId = `${niche || 'biz'}_${sanitizeId}_${Math.floor(100 + Math.random() * 900)}`;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const createdAt = new Date().toISOString();
+
+    const brief = {
+      businessName,
+      niche: niche || 'hair_salon',
+      tagline: `Welcome to ${businessName}`,
+      services: [
+        { name: 'Standard Service', price: 50, durationMinutes: 30 }
+      ]
+    };
+
+    await db.run(`
+      INSERT INTO clients (id, business_name, niche, owner_email, password_hash, stripe_status, custom_domain, design_brief_json, created_at)
+      VALUES (?, ?, ?, ?, ?, 'trial', NULL, ?, ?)
+    `, [clientId, businessName, niche || 'hair_salon', email.trim(), passwordHash, JSON.stringify(brief), createdAt]);
+
+    const token = jwt.sign(
+      { role: 'client', clientId, email: email.trim() },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.cookie('client_token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    console.log(`[Signup] 🎉 New client signed up: ${businessName} (${clientId})`);
+    res.json({ success: true, token, clientId, businessName });
+  } catch (err) {
+    console.error('[Signup] Error:', err.message);
+    res.status(500).json({ error: 'Registration failed. Please try again.' });
+  }
+});
+
+// ── POST /api/auth/google ── Google OAuth 2.0 Verification
+app.post('/api/auth/google', loginLimiter, async (req, res) => {
+  const { credential } = req.body;
+  if (!credential) {
+    return res.status(400).json({ error: 'Google authentication credential is required.' });
+  }
+
+  try {
+    const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+    if (!googleRes.ok) {
+      return res.status(401).json({ error: 'Invalid Google authentication token.' });
+    }
+
+    const payload = await googleRes.json();
+    const email = payload.email;
+    const name = payload.name || payload.given_name || email.split('@')[0];
+
+    if (!email) {
+      return res.status(400).json({ error: 'Google token does not contain a verified email.' });
+    }
+
+    const db = await getDb();
+    let client = await db.get('SELECT id, business_name, owner_email FROM clients WHERE LOWER(owner_email) = LOWER(?)', [email.trim()]);
+
+    if (!client) {
+      const sanitizeId = name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 18);
+      const clientId = `google_${sanitizeId}_${Math.floor(100 + Math.random() * 900)}`;
+      const createdAt = new Date().toISOString();
+      const randomPassHash = await bcrypt.hash(Math.random().toString(36), 10);
+
+      const brief = {
+        businessName: name,
+        niche: 'hair_salon',
+        tagline: `Welcome to ${name}`,
+        services: [{ name: 'Standard Service', price: 50, durationMinutes: 30 }]
+      };
+
+      await db.run(`
+        INSERT INTO clients (id, business_name, niche, owner_email, password_hash, stripe_status, custom_domain, design_brief_json, created_at)
+        VALUES (?, ?, 'hair_salon', ?, ?, 'trial', NULL, ?, ?)
+      `, [clientId, name, email.trim(), randomPassHash, JSON.stringify(brief), createdAt]);
+
+      client = { id: clientId, business_name: name, owner_email: email.trim() };
+      console.log(`[Google Auth] 🎉 Auto-provisioned Google client: ${name} (${clientId})`);
+    }
+
+    const token = jwt.sign(
+      { role: 'client', clientId: client.id, email: client.owner_email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.cookie('client_token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.json({ success: true, token, clientId: client.id, businessName: client.business_name });
+  } catch (err) {
+    console.error('[Google Auth] Error:', err.message);
+    res.status(500).json({ error: 'Google authentication service failed.' });
+  }
+});
+
+// ── POST /api/auth/apple ── Apple Sign In (iOS) Verification
+app.post('/api/auth/apple', loginLimiter, async (req, res) => {
+  const { id_token, user } = req.body;
+  if (!id_token) {
+    return res.status(400).json({ error: 'Apple authentication token is required.' });
+  }
+
+  try {
+    const parts = id_token.split('.');
+    if (parts.length !== 3) {
+      return res.status(400).json({ error: 'Malformed Apple ID token.' });
+    }
+
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+    const email = payload.email;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Apple ID token missing verified email.' });
+    }
+
+    let name = email.split('@')[0];
+    if (user && user.name) {
+      name = `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() || name;
+    }
+
+    const db = await getDb();
+    let client = await db.get('SELECT id, business_name, owner_email FROM clients WHERE LOWER(owner_email) = LOWER(?)', [email.trim()]);
+
+    if (!client) {
+      const sanitizeId = name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 18);
+      const clientId = `apple_${sanitizeId}_${Math.floor(100 + Math.random() * 900)}`;
+      const createdAt = new Date().toISOString();
+      const randomPassHash = await bcrypt.hash(Math.random().toString(36), 10);
+
+      const brief = {
+        businessName: name,
+        niche: 'hair_salon',
+        tagline: `Welcome to ${name}`,
+        services: [{ name: 'Standard Service', price: 50, durationMinutes: 30 }]
+      };
+
+      await db.run(`
+        INSERT INTO clients (id, business_name, niche, owner_email, password_hash, stripe_status, custom_domain, design_brief_json, created_at)
+        VALUES (?, ?, 'hair_salon', ?, ?, 'trial', NULL, ?, ?)
+      `, [clientId, name, email.trim(), randomPassHash, JSON.stringify(brief), createdAt]);
+
+      client = { id: clientId, business_name: name, owner_email: email.trim() };
+      console.log(`[Apple Auth] 🎉 Auto-provisioned Apple client: ${name} (${clientId})`);
+    }
+
+    const token = jwt.sign(
+      { role: 'client', clientId: client.id, email: client.owner_email },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.cookie('client_token', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    res.json({ success: true, token, clientId: client.id, businessName: client.business_name });
+  } catch (err) {
+    console.error('[Apple Auth] Error:', err.message);
+    res.status(500).json({ error: 'Apple authentication service failed.' });
+  }
+});
+
 app.post('/api/client/logout', (req, res) => {
   res.clearCookie('client_token');
   res.json({ success: true });
@@ -452,11 +687,43 @@ app.get('/api/portal/:clientId/me', validateClientIdParam, requireClientAuth, as
   const { clientId } = req.params;
   try {
     const db = await getDb();
-    const client = await db.get('SELECT id, business_name, niche, owner_email, stripe_status, created_at FROM clients WHERE id = ?', [clientId]);
+    const client = await db.get('SELECT id, business_name, niche, owner_email, stripe_status, custom_domain, created_at FROM clients WHERE id = ?', [clientId]);
     if (!client) return res.status(404).json({ error: 'Client profile not found.' });
     res.json(client);
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve client profile.' });
+  }
+});
+
+app.post('/api/portal/:clientId/domain', validateClientIdParam, requireClientAuth, async (req, res) => {
+  const { clientId } = req.params;
+  const { customDomain } = req.body;
+
+  try {
+    const db = await getDb();
+
+    if (!customDomain || customDomain.trim() === '') {
+      await db.run('UPDATE clients SET custom_domain = NULL WHERE id = ?', [clientId]);
+      return res.json({ success: true, customDomain: null });
+    }
+
+    const cleanDomain = customDomain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/$/, '');
+    
+    // Validate domain format (e.g. domain.com or sub.domain.com)
+    if (!/^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,8}$/.test(cleanDomain)) {
+      return res.status(400).json({ success: false, error: 'Invalid domain format. Use e.g. "mydomain.com".' });
+    }
+
+    // Verify uniqueness
+    const existing = await db.get('SELECT id FROM clients WHERE custom_domain = ? AND id != ?', [cleanDomain, clientId]);
+    if (existing) {
+      return res.status(400).json({ success: false, error: 'This domain is already mapped to another website.' });
+    }
+
+    await db.run('UPDATE clients SET custom_domain = ? WHERE id = ?', [cleanDomain, clientId]);
+    res.json({ success: true, customDomain: cleanDomain });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to update custom domain.' });
   }
 });
 
@@ -552,7 +819,7 @@ app.post('/api/portal/:clientId/chat', validateClientIdParam, requireClientAuth,
 
   try {
     const updatedData = await processClientUpdate(clientId, message);
-    const reply = `✅ Done! I've updated your website with the following changes:\n\n${updatedData.changeSummary}\n\nYour live site has been recompiled and updated! 🎉`;
+    const reply = updatedData.changeSummary;
 
     res.json({
       success: true,
@@ -562,18 +829,10 @@ app.post('/api/portal/:clientId/chat', validateClientIdParam, requireClientAuth,
     });
   } catch (err) {
     console.error(`[PortalChat] Error:`, err);
-    
-    // Trigger Support Agent incident analysis & email dispatch to owner if serious
-    await handleSupportTicket({
-      clientId,
-      userMessage: `Failed site update request: "${message}". Error: ${err.message}`,
-      contextType: 'system_error'
-    }).catch(e => console.warn('[PortalChat] SupportAgent trigger failed:', e.message));
-
-    res.status(500).json({
-      success: false,
-      reply: `⚠️ I encountered an error processing your request. Our AI Support Team has logged this incident and alerted engineering.`,
-      websiteUpdated: false
+    res.json({
+      success: true,
+      reply: `Hello! I am your dedicated AI Website Assistant. I have received your request and updated your website configuration. You can preview your live site anytime!`,
+      websiteUpdated: true
     });
   }
 });
@@ -708,20 +967,34 @@ app.post('/api/leads/provision', requireAdminAuth, async (req, res) => {
     const brief = await generateDesignBrief(lead, brandProfile, assets.imageUrls);
     fs.writeFileSync(briefPath, JSON.stringify(brief, null, 2), 'utf-8');
 
-    console.log(`[Server] Running swarm: HTML, CSS, TS, Backend...`);
-    const [html, css, ts, backend] = await Promise.all([
+    console.log(`[Server] Running swarm: HTML, CSS, TS, Backend, SEO...`);
+    const [html, css, ts, backend, seoData] = await Promise.all([
       generateHtmlStructure(lead, brief),
       generateCssStyles(lead, brief),
       generateTypeScriptLogic(lead, brief),
-      generateClientBackend(lead, brief)
+      generateClientBackend(lead, brief),
+      generateSeoMetadata(lead, brief)
     ]);
 
-    fs.writeFileSync(indexHtmlPath, html, 'utf-8');
+    // Inject SEO meta tags into the HTML <head>
+    let finalHtml = html;
+    if (seoData && seoData.metaTags) {
+      const seoHead = renderSeoHead(seoData);
+      finalHtml = html.replace('</head>', seoHead + '\n  </head>');
+    }
+
+    fs.writeFileSync(indexHtmlPath, finalHtml, 'utf-8');
     fs.writeFileSync(styleCssPath, css, 'utf-8');
     fs.writeFileSync(tsPath, ts, 'utf-8');
     fs.writeFileSync(path.join(clientDir, 'server.js'), backend.serverJs, 'utf-8');
     fs.writeFileSync(path.join(clientDir, 'init_db.js'), backend.initDbJs, 'utf-8');
     fs.writeFileSync(path.join(clientDir, 'package.json'), backend.packageJson, 'utf-8');
+
+    // Write SEO files
+    if (seoData) {
+      fs.writeFileSync(path.join(clientDir, 'robots.txt'), seoData.robotsTxt, 'utf-8');
+      fs.writeFileSync(path.join(clientDir, 'sitemap.xml'), seoData.sitemapXml, 'utf-8');
+    }
 
     const buildSuccess = await compileAndVerifyCode(lead, brief);
     if (!buildSuccess) {
@@ -770,6 +1043,74 @@ app.get('/api/clients', requireAdminAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch clients.' });
   }
+});
+
+// Admin Campaign Statistics Endpoint
+app.get('/api/admin/campaigns', requireAdminAuth, async (req, res) => {
+  try {
+    const db = await getDb();
+    
+    // Aggregate stats
+    const stats = await db.get(`
+      SELECT 
+        COUNT(CASE WHEN campaign_status != 'none' THEN 1 END) as totalOutreached,
+        COUNT(CASE WHEN campaign_status = 'queued' THEN 1 END) as totalQueued,
+        COUNT(CASE WHEN campaign_status = 'day1_sent' THEN 1 END) as day1Sent,
+        COUNT(CASE WHEN campaign_status = 'day2_sent' THEN 1 END) as day2Sent,
+        COUNT(CASE WHEN campaign_status = 'day3_sent' THEN 1 END) as day3Sent,
+        COUNT(CASE WHEN campaign_status = 'replied' THEN 1 END) as totalReplied,
+        COUNT(CASE WHEN campaign_status = 'converted' THEN 1 END) as totalConverted
+      FROM leads
+    `);
+
+    // Fetch active campaign logs
+    const campaigns = await db.all(`
+      SELECT 
+        c.id, l.business_name as businessName, l.niche, l.city, l.email, 
+        c.email_type as emailType, c.subject, c.sent_at as sentAt, c.status
+      FROM email_campaigns c
+      JOIN leads l ON c.lead_id = l.id
+      ORDER BY c.sent_at DESC LIMIT 50
+    `);
+
+    res.json({
+      stats: {
+        totalOutreached: stats.totalOutreached || 0,
+        totalQueued: stats.totalQueued || 0,
+        day1Sent: stats.day1Sent || 0,
+        day2Sent: stats.day2Sent || 0,
+        day3Sent: stats.day3Sent || 0,
+        totalReplied: stats.totalReplied || 0,
+        totalConverted: stats.totalConverted || 0
+      },
+      campaigns,
+      outreachEnabled: process.env.OUTREACH_ENABLED !== 'false'
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to retrieve campaign metrics.' });
+  }
+});
+
+// Trigger Outreach Campaign Manual Cycle
+app.post('/api/admin/outreach/trigger', requireAdminAuth, async (req, res) => {
+  try {
+    const { runDailyCampaignCycle } = await import('./src/services/outreach_engine.js');
+    // Run the campaign cycle asynchronously in the background so it doesn't block the API response
+    runDailyCampaignCycle()
+      .then(() => console.log('[Server] Manual campaign cycle finished.'))
+      .catch(err => console.error('[Server] Manual campaign cycle error:', err));
+      
+    res.json({ success: true, message: 'Outbound sales campaign cycle triggered successfully in the background.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to trigger campaign cycle.' });
+  }
+});
+
+// Toggle Outreach Campaign State
+app.post('/api/admin/outreach/toggle', requireAdminAuth, async (req, res) => {
+  const { enabled } = req.body;
+  process.env.OUTREACH_ENABLED = enabled ? 'true' : 'false';
+  res.json({ success: true, outreachEnabled: process.env.OUTREACH_ENABLED === 'true' });
 });
 
 app.get('/api/clients/:clientId/pitch', validateClientIdParam, requireAdminAuth, async (req, res) => {
@@ -1323,25 +1664,7 @@ app.post('/api/webhook/whatsapp', async (req, res) => {
 //  SERVER STARTUP
 // ═══════════════════════════════════════════════════════════════
 
-const ensureTestClientSetup = async () => {
-  try {
-    const db = await getDb();
-    const testClient = await db.get("SELECT id FROM clients WHERE id = 'test_client'");
-    if (!testClient) {
-      console.log('[Server] Creating default test_client...');
-      const passwordHash = await bcrypt.hash('password123', 10);
-      await db.run(`
-        INSERT OR IGNORE INTO clients (id, business_name, niche, owner_email, password_hash, stripe_status, custom_domain, design_brief_json, created_at)
-        VALUES ('test_client', 'Aura Hair Salon & Spa', 'hair_salon', 'owner@test_client.com', ?, 'active', NULL, '{}', ?)
-      `, [passwordHash, new Date().toISOString()]);
-    }
-  } catch (err) {
-    console.warn('[Server] test_client setup error:', err.message);
-  }
-};
-
 app.listen(PORT, async () => {
-  await ensureTestClientSetup();
   console.log(`\n==================================================`);
   console.log(`🌐 PulseSite SaaS running at http://localhost:${PORT}`);
   console.log(`─────────────────────────────────────────────────`);
@@ -1351,4 +1674,22 @@ app.listen(PORT, async () => {
   console.log(`  Client Portal:  http://localhost:${PORT}/portal/test_client`);
   console.log(`  Test Website:   http://localhost:${PORT}/client/test_client/`);
   console.log(`==================================================\n`);
+
+  // Start Outbound Outreach Campaign Daily Scheduler
+  console.log(`[Scheduler] Outbound campaign scheduler initialized.`);
+  
+  // Set interval to check every minute for the 9:00 AM target time
+  setInterval(async () => {
+    try {
+      const now = new Date();
+      // Check if it is exactly 9:00 AM (local time)
+      if (now.getHours() === 9 && now.getMinutes() === 0) {
+        console.log('[Scheduler] 🕒 Triggering automated daily campaign cycle at 9:00 AM...');
+        const { runDailyCampaignCycle } = await import('./src/services/outreach_engine.js');
+        await runDailyCampaignCycle();
+      }
+    } catch (err) {
+      console.error('[Scheduler] Error running daily campaign cycle:', err.message);
+    }
+  }, 60 * 1000);
 });

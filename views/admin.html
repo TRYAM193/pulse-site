@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PulseSite | Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    :root {
+      --bg: #080a0f;
+      --sidebar-bg: rgba(15, 19, 28, 0.9);
+      --card-bg: #151a26;
+      --card-border: rgba(226, 232, 240, 0.12);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --silver-btn: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+      --silver-btn-text: #090d16;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --sidebar-bg: rgba(255, 255, 255, 0.9);
+      --card-bg: #ffffff;
+      --card-border: rgba(15, 23, 42, 0.12);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --silver-btn: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --silver-btn-text: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -ms-overflow-style: none !important; scrollbar-width: none !important; }
+    *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
     * {
       margin: 0;
       padding: 0;
@@ -14,47 +39,38 @@
     }
 
     body {
-      background-color: #080c14;
-      color: #f3f4f6;
+      background-color: var(--bg);
+      color: var(--text-main);
       display: flex;
       min-height: 100vh;
       overflow: hidden;
       position: relative;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     /* Gradient Background Glows */
     .glow-1 {
       position: absolute;
-      top: -10%;
-      left: 10%;
-      width: 600px;
-      height: 600px;
+      top: -10%; left: 10%; width: 600px; height: 600px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-      filter: blur(80px);
-      z-index: -1;
-      pointer-events: none;
+      background: radial-gradient(circle, rgba(226, 232, 240, 0.05) 0%, transparent 70%);
+      filter: blur(80px); z-index: -1; pointer-events: none;
     }
 
     .glow-2 {
       position: absolute;
-      bottom: -10%;
-      right: 10%;
-      width: 600px;
-      height: 600px;
+      bottom: -10%; right: 10%; width: 600px; height: 600px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
-      filter: blur(80px);
-      z-index: -1;
-      pointer-events: none;
+      background: radial-gradient(circle, rgba(226, 232, 240, 0.04) 0%, transparent 70%);
+      filter: blur(80px); z-index: -1; pointer-events: none;
     }
 
     /* Sidebar Styling */
     .sidebar {
       width: 280px;
-      background: rgba(13, 20, 35, 0.8);
+      background: var(--sidebar-bg);
       backdrop-filter: blur(20px);
-      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      border-right: 1px solid var(--card-border);
       display: flex;
       flex-direction: column;
       height: 100vh;
@@ -69,24 +85,10 @@
       margin-bottom: 3rem;
     }
 
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: #fff;
-    }
-
     .logo-text {
       font-size: 1.5rem;
       font-weight: 800;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-main);
     }
 
     .nav-links {
@@ -102,7 +104,7 @@
       align-items: center;
       gap: 1rem;
       padding: 0.85rem 1rem;
-      color: #9ca3af;
+      color: var(--text-muted);
       text-decoration: none;
       border-radius: 12px;
       font-weight: 600;
@@ -111,14 +113,15 @@
     }
 
     .nav-link:hover {
-      background: rgba(255, 255, 255, 0.03);
-      color: #f3f4f6;
+      background: var(--card-bg);
+      color: var(--text-main);
     }
 
     .nav-link.active {
-      background: rgba(99, 102, 241, 0.1);
-      color: #6366f1;
-      border-left: 3px solid #6366f1;
+      background: var(--card-bg);
+      color: var(--text-main);
+      border-left: 3px solid var(--text-main);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .logout-btn {
@@ -349,11 +352,36 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .btn-outline:hover {
       background: rgba(255, 255, 255, 0.05);
       border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-pro {
+      background: var(--silver-btn);
+      color: var(--silver-btn-text);
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-pro:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
     }
 
     .form-group {
@@ -496,6 +524,9 @@
       font-weight: 600;
       cursor: pointer;
       position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .side-panel-nav-btn.active {
@@ -553,29 +584,43 @@
 
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="logo-container">
-      <div class="logo-icon">🚀</div>
-      <span class="logo-text">PulseSite</span>
+    <div class="logo-container" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="10" fill="url(#silverCardGrad)"/>
+        <rect x="0.5" y="0.5" width="31" height="31" rx="9.5" stroke="url(#silverBorderGrad)" stroke-opacity="0.4"/>
+        <path d="M6 16H10.5L13 9L17 23L20 13.5L22.5 16H26" stroke="url(#pulseLineGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs>
+          <linearGradient id="silverCardGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#1e2433"/><stop offset="1" stop-color="#090c14"/></linearGradient>
+          <linearGradient id="silverBorderGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#475569"/></linearGradient>
+          <linearGradient id="pulseLineGrad" x1="6" y1="9" x2="26" y2="23" gradientUnits="userSpaceOnUse"><stop stop-color="#ffffff"/><stop offset="0.5" stop-color="#cbd5e1"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
+        </defs>
+      </svg>
+      <span class="logo-text" style="font-weight:800;font-size:1.3rem;">PulseSite</span>
     </div>
     <ul class="nav-links">
-      <li><a class="nav-link active" onclick="switchTab('overview')">📊 Overview</a></li>
-      <li><a class="nav-link" onclick="switchTab('prospector')">🔎 Lead Scout</a></li>
-      <li><a class="nav-link" onclick="switchTab('sites')">🌐 Generated Sites</a></li>
-      <li><a class="nav-link" onclick="switchTab('revenue')">💰 Revenue & Billing</a></li>
-      <li><a class="nav-link" onclick="switchTab('incidents')">🚨 Incident Alerts</a></li>
+      <li><a class="nav-link active" onclick="switchTab('overview')"><i data-lucide="layout-dashboard" style="width:18px;"></i> Overview</a></li>
+      <li><a class="nav-link" onclick="switchTab('prospector')"><i data-lucide="search" style="width:18px;"></i> Lead Scout</a></li>
+      <li><a class="nav-link" onclick="switchTab('sites')"><i data-lucide="globe" style="width:18px;"></i> Generated Sites</a></li>
+      <li><a class="nav-link" onclick="switchTab('revenue')"><i data-lucide="dollar-sign" style="width:18px;"></i> Revenue & Billing</a></li>
+      <li><a class="nav-link" onclick="switchTab('incidents')"><i data-lucide="alert-triangle" style="width:18px;"></i> Incident Alerts</a></li>
+      <li><a class="nav-link" onclick="switchTab('campaigns')"><i data-lucide="send" style="width:18px;"></i> Outreach Drips</a></li>
     </ul>
-    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    <button class="logout-btn" onclick="logout()"><i data-lucide="log-out" style="width:16px;"></i> Logout</button>
   </aside>
 
   <!-- Main Content -->
   <main class="main-content">
     <div class="header-section">
       <div>
-        <h1 id="header-greeting">Good morning, Admin ✨</h1>
+        <h1 id="header-greeting">Good morning, Admin</h1>
         <p id="header-date">Loading date...</p>
       </div>
-      <div>
-        <button class="btn-outline" onclick="loadAllStats()">🔄 Refresh Data</button>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle Dark/Light Mode" style="background:var(--card-bg);border:1px solid var(--card-border);color:var(--text-main);width:40px;height:40px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <i data-lucide="sun" id="theme-icon-sun" style="width:18px;"></i>
+          <i data-lucide="moon" id="theme-icon-moon" style="width:18px; display:none;"></i>
+        </button>
+        <button class="btn-outline" onclick="loadAllStats()"><i data-lucide="refresh-cw" style="width:16px;"></i> Refresh Data</button>
       </div>
     </div>
 
@@ -609,16 +654,16 @@
 
       <!-- Quick Actions -->
       <div class="section-card">
-        <h2 class="section-title">⚡ Quick Actions</h2>
+        <h2 class="section-title"><i data-lucide="zap" style="width:20px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Quick Actions</h2>
         <div style="display: flex; gap: 1rem;">
-          <button class="btn-gradient" onclick="switchTab('prospector')">🔎 Scout New Leads</button>
-          <button class="btn-outline" onclick="switchTab('sites')">🌐 View All Generated Sites</button>
+          <button class="btn-gradient" onclick="switchTab('prospector')"><i data-lucide="search" style="width:16px;"></i> Scout New Leads</button>
+          <button class="btn-outline" onclick="switchTab('sites')"><i data-lucide="globe" style="width:16px;"></i> View All Generated Sites</button>
         </div>
       </div>
 
       <!-- Activity Feed -->
       <div class="section-card">
-        <h2 class="section-title">📈 Live Activity Feed</h2>
+        <h2 class="section-title"><i data-lucide="activity" style="width:20px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Live Activity Feed</h2>
         <div class="activity-list" id="activity-feed">
           <p style="color: #9ca3af;">Loading live feed events...</p>
         </div>
@@ -630,17 +675,17 @@
     <!-- ────────────────────────────────────────── -->
     <div id="prospector" class="dashboard-tab">
       <div class="section-card">
-        <h2 class="section-title">🔎 Find Local Business Leads</h2>
+        <h2 class="section-title"><i data-lucide="search" style="width:20px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Find Local Business Leads</h2>
         <p style="color: #9ca3af; margin-bottom: 1.5rem;">Scout businesses that do not have websites or have slow-loading platforms, and provision instant bespoke sites for them.</p>
 
         <div class="form-group">
           <select class="form-control" id="prospect-niche" style="max-width: 250px;">
-            <option value="hair_salon">💇 Hair Salon</option>
+            <option value="hair_salon">Hair Salon</option>
             <option value="plumber">🪠 Plumber</option>
-            <option value="dentist">🦷 Dentist</option>
-            <option value="restaurant">🍔 Restaurant</option>
-            <option value="gym">🏋️ Gym</option>
-            <option value="spa">🧖 Spa & Wellness</option>
+            <option value="dentist">Dentist</option>
+            <option value="restaurant">Restaurant</option>
+            <option value="gym">Gym</option>
+            <option value="spa">Spa & Wellness</option>
           </select>
           <input type="text" class="form-control" id="prospect-city" placeholder="e.g. Seattle, Dallas, Chicago" value="Seattle">
           <button class="btn-gradient" onclick="scoutLeads()">Find Leads</button>
@@ -671,7 +716,7 @@
     <!-- ────────────────────────────────────────── -->
     <div id="sites" class="dashboard-tab">
       <div class="section-card">
-        <h2 class="section-title">🌐 Generated Client Portals</h2>
+        <h2 class="section-title"><i data-lucide="globe" style="width:20px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Generated Client Portals</h2>
         <p style="color: #9ca3af; margin-bottom: 1.5rem;">View live websites, monitor traffic metrics, and approve/reject bookings on behalf of client portals.</p>
 
         <div class="custom-table-container">
@@ -699,7 +744,7 @@
     <!-- ────────────────────────────────────────── -->
     <div id="revenue" class="dashboard-tab">
       <div class="section-card">
-        <h2 class="section-title">💰 Monthly Recurring Revenue Breakdown</h2>
+        <h2 class="section-title"><i data-lucide="dollar-sign" style="width:20px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Monthly Recurring Revenue Breakdown</h2>
         <p style="color: #9ca3af; margin-bottom: 1.5rem;">See subscription updates, upgrade trials to active payment status, and verify total SaaS MRR output.</p>
 
         <div class="custom-table-container">
@@ -726,7 +771,7 @@
     <!-- ────────────────────────────────────────── -->
     <div id="incidents" class="dashboard-tab">
       <div class="section-card">
-        <h2 class="section-title">🚨 Support Incidents & Emergency Alerts</h2>
+        <h2 class="section-title"><i data-lucide="alert-triangle" style="width:20px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Support Incidents & Emergency Alerts</h2>
         <p style="color: #9ca3af; margin-bottom: 1.5rem;">All CRITICAL and HIGH severity alerts are automatically emailed to <strong>shreyaskumarswamy2007@gmail.com</strong> in real-time.</p>
 
         <div class="custom-table-container">
@@ -748,6 +793,71 @@
         </div>
       </div>
     </div>
+
+    <!-- ────────────────────────────────────────── -->
+    <!-- TAB 6: OUTBOUND OUTREACH CAMPAIGNS -->
+    <!-- ────────────────────────────────────────── -->
+    <div id="campaigns" class="dashboard-tab">
+      <div class="section-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 class="section-title"><i data-lucide="send" style="width:20px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Outbound Drip Campaigns & Auto-Outreach</h2>
+            <p style="color: #9ca3af; margin-bottom: 0;">Automated pipeline mapping and cold emailing of local leads without websites.</p>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <label class="switch-container" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.9rem;">
+              <span id="outreach-status-lbl">Auto-Outreach: Active</span>
+              <input type="checkbox" id="outreach-toggle-cb" onchange="toggleOutreachStatus()" style="width:18px; height:18px; accent-color:#6366f1;">
+            </label>
+            <button class="btn-pro" onclick="triggerOutreachCycle()"><i data-lucide="zap" style="width:16px;"></i> Run Campaign Cycle Now</button>
+          </div>
+        </div>
+
+        <!-- Outreach Stats Grid -->
+        <div class="stats-grid" style="margin-bottom: 2rem;">
+          <div class="stat-card blue">
+            <span class="stat-title">Total Outreached</span>
+            <span class="stat-val" id="campaign-outreached-cnt">0</span>
+            <span class="stat-change">Outbound</span>
+          </div>
+          <div class="stat-card orange">
+            <span class="stat-title">In Drip (Day 1-3)</span>
+            <span class="stat-val" id="campaign-active-cnt">0</span>
+            <span class="stat-change">Active</span>
+          </div>
+          <div class="stat-card green">
+            <span class="stat-title">Total Replied</span>
+            <span class="stat-val" id="campaign-replied-cnt">0</span>
+            <span class="stat-change">Response</span>
+          </div>
+          <div class="stat-card purple">
+            <span class="stat-title">Total Converted</span>
+            <span class="stat-val" id="campaign-converted-cnt">0</span>
+            <span class="stat-change">Converted</span>
+          </div>
+        </div>
+
+        <h3 style="font-weight:700; margin-bottom:1rem; font-size:1.1rem; color:var(--text-main);">Recent Outreach Emails Dispatched</h3>
+        <div class="custom-table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Business Name</th>
+                <th>Niche</th>
+                <th>City</th>
+                <th>Outreach Step</th>
+                <th>Email Subject</th>
+                <th>Timestamp</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="campaigns-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Side Panel console -->
@@ -759,9 +869,9 @@
       </div>
 
       <div class="side-panel-nav">
-        <button class="side-panel-nav-btn active" onclick="switchPanelTab('analytics')">📊 Analytics</button>
-        <button class="side-panel-nav-btn" onclick="switchPanelTab('pitch')">✉️ Outreach Pitch</button>
-        <button class="side-panel-nav-btn" onclick="switchPanelTab('hosting')">🚀 Access & Settings</button>
+        <button class="side-panel-nav-btn active" onclick="switchPanelTab('analytics')"><i data-lucide="bar-chart-2" style="width:16px;"></i> Analytics</button>
+        <button class="side-panel-nav-btn" onclick="switchPanelTab('pitch')"><i data-lucide="mail" style="width:16px;"></i> Outreach Pitch</button>
+        <button class="side-panel-nav-btn" onclick="switchPanelTab('hosting')"><i data-lucide="settings" style="width:16px;"></i> Access & Settings</button>
       </div>
 
       <div class="side-panel-content">
@@ -817,7 +927,7 @@
 
           <h4 style="margin-bottom: 0.5rem; font-size: 1.05rem;">Live Preview URL</h4>
           <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem;">The customer-facing portal site is live at:</p>
-          <a id="panel-live-preview-url" href="#" target="_blank" class="btn-gradient" style="text-decoration: none; display: inline-flex;">View Customer Site 🔗</a>
+          <a id="panel-live-preview-url" href="#" target="_blank" class="btn-gradient" style="text-decoration: none; display: inline-flex;">View Customer Site <i data-lucide="external-link" style="width:14px;"></i></a>
         </div>
       </div>
     </div>
@@ -863,6 +973,7 @@
       if (tabId === 'sites') loadClients();
       if (tabId === 'revenue') loadRevenueBreakdown();
       if (tabId === 'incidents') loadIncidents();
+      if (tabId === 'campaigns') loadCampaigns();
     }
 
     // Load stats
@@ -888,7 +999,7 @@
 
         feedContainer.innerHTML = activity.map(act => {
           const typeLabel = act.event_type === 'pageview' ? 'Page View logged' : 'New Customer Booking';
-          const typeIcon = act.event_type === 'pageview' ? '🟢' : '📅';
+          const typeIcon = act.event_type === 'pageview' ? '<i data-lucide="eye" style="width:14px;"></i>' : '<i data-lucide="calendar" style="width:14px;"></i>';
           const time = new Date(act.timestamp).toLocaleTimeString();
           return `
             <div class="activity-item">
@@ -919,7 +1030,7 @@
       const table = document.getElementById('prospect-table');
       const tbody = document.getElementById('prospect-tbody');
 
-      statusText.innerText = "🔍 Scouting Google Places for businesses missing websites...";
+      statusText.innerText = "Scouting Google Places for businesses missing websites...";
       table.style.display = 'none';
 
       try {
@@ -943,7 +1054,7 @@
           <tr id="row-${lead.id}">
             <td>
               <strong>${escapeHtml(lead.businessName)}</strong><br>
-              <span style="color: #9ca3af; font-size: 0.85rem;">📍 ${escapeHtml(lead.address || 'Unknown Address')}</span>
+              <span style="color: #9ca3af; font-size: 0.85rem;"><i data-lucide="map-pin" style="width:14px;display:inline-block;vertical-align:middle;"></i> ${escapeHtml(lead.address || 'Unknown Address')}</span>
             </td>
             <td>⭐ ${escapeHtml(String(lead.rating || 'N/A'))}</td>
             <td>${escapeHtml(String(lead.reviews || 0))} reviews</td>
@@ -963,7 +1074,7 @@
       const row = document.getElementById(`row-${lead.id}`);
       const btnCell = row.querySelector('td:last-child');
       
-      btnCell.innerHTML = `<span style="color: #a855f7; font-weight: 700;">⚙️ Generating site via Swarm...</span>`;
+      btnCell.innerHTML = `<span style="color: #a855f7; font-weight: 700;">Generating site via Swarm...</span>`;
 
       try {
         const res = await apiFetch('/api/leads/provision', {
@@ -973,7 +1084,7 @@
         const result = await res.json();
         
         if (result.success) {
-          btnCell.innerHTML = `<a href="/client/${lead.id}/" target="_blank" style="color: #10b981; font-weight: 700; text-decoration: none;">✓ Generated! View Website</a>`;
+          btnCell.innerHTML = `<a href="/client/${lead.id}/" target="_blank" style="color: #10b981; font-weight: 700; text-decoration: none;">Generated! View Website</a>`;
           loadAllStats();
         } else {
           btnCell.innerHTML = `<span style="color: #ef4444; font-weight: 700;">QA build failed. Retry.</span>`;
@@ -1181,7 +1292,7 @@
           const sevColor = inc.severity === 'CRITICAL' ? '#ef4444' : inc.severity === 'HIGH' ? '#f59e0b' : '#3b82f6';
           const sevBadge = `<span style="background: ${sevColor}22; color: ${sevColor}; border: 1px solid ${sevColor}44; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">${inc.severity}</span>`;
           const actionBtn = inc.status === 'resolved' 
-            ? `<span style="color: #10b981; font-weight: 700; font-size: 0.8rem;">✓ Resolved</span>` 
+            ? `<span style="color: #10b981; font-weight: 700; font-size: 0.8rem;">Resolved</span>` 
             : `<button class="btn-gradient" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="resolveIncident('${inc.id}')">Resolve Ticket</button>`;
 
           return `
@@ -1208,6 +1319,125 @@
         alert("Failed to resolve incident.");
       }
     }
+
+    // Load Outreach Campaign Metrics and Logs
+    async function loadCampaigns() {
+      const tbody = document.getElementById('campaigns-tbody');
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #9ca3af;">Loading outreach drip list...</td></tr>`;
+
+      try {
+        const res = await apiFetch('/api/admin/campaigns');
+        const data = await res.json();
+
+        // Populate Stats
+        document.getElementById('campaign-outreached-cnt').innerText = data.stats.totalOutreached;
+        document.getElementById('campaign-active-cnt').innerText = data.stats.day1Sent + data.stats.day2Sent + data.stats.day3Sent;
+        document.getElementById('campaign-replied-cnt').innerText = data.stats.totalReplied;
+        document.getElementById('campaign-converted-cnt').innerText = data.stats.totalConverted;
+
+        // Toggle Switch & Label
+        document.getElementById('outreach-toggle-cb').checked = data.outreachEnabled;
+        document.getElementById('outreach-status-lbl').innerText = data.outreachEnabled 
+          ? 'Auto-Outreach: Active (Runs 9 AM)' 
+          : 'Auto-Outreach: Paused';
+
+        if (data.campaigns.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #9ca3af;">No outreach emails logged yet. Run a campaign cycle.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = data.campaigns.map(camp => {
+          const stepBadge = camp.emailType === 'cold_intro' 
+            ? '<span style="background: rgba(99,102,241,0.15); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); padding: 2px 6px; border-radius: 4px; font-size:0.75rem;">Day 1: Intro</span>'
+            : camp.emailType === 'follow_up_1'
+            ? '<span style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); padding: 2px 6px; border-radius: 4px; font-size:0.75rem;">Day 3: Drip 1</span>'
+            : '<span style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 2px 6px; border-radius: 4px; font-size:0.75rem;">Day 5: Drip 2</span>';
+
+          return `
+            <tr>
+              <td><strong>${camp.businessName}</strong></td>
+              <td><span style="text-transform: capitalize;">${camp.niche.replace('_', ' ')}</span></td>
+              <td>${camp.city}</td>
+              <td>${stepBadge}</td>
+              <td style="font-size:0.85rem; max-width: 250px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${camp.subject}</td>
+              <td style="font-size:0.8rem;">${new Date(camp.sentAt).toLocaleString()}</td>
+              <td><span class="status-badge active" style="text-transform: uppercase; font-size: 0.7rem;">${camp.status}</span></td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444;">Error loading campaign metrics.</td></tr>`;
+      }
+    }
+
+    async function triggerOutreachCycle() {
+      if (!confirm('This will trigger a manual out-of-schedule run of the Outbound Outreach Swarm. It will prospect for new leads and queue initial emails. Continue?')) return;
+      
+      const btn = document.querySelector('[onclick="triggerOutreachCycle()"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i data-lucide="loader" class="animate-spin" style="width:16px;"></i> Running Cycle...`;
+      if (window.lucide) lucide.createIcons();
+      
+      try {
+        const res = await apiFetch('/api/admin/outreach/trigger', { method: 'POST' });
+        const result = await res.json();
+        if (result.success) {
+          alert('Campaign cycle initiated successfully in the background. Generating sites and emailing leads...');
+          setTimeout(loadCampaigns, 5000);
+        }
+      } catch (err) {
+        alert('Failed to trigger campaign cycle.');
+      } finally {
+        btn.innerHTML = originalText;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    async function toggleOutreachStatus() {
+      const isChecked = document.getElementById('outreach-toggle-cb').checked;
+      try {
+        await apiFetch('/api/admin/outreach/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled: isChecked })
+        });
+        loadCampaigns();
+      } catch (err) {
+        alert('Failed to update outreach state.');
+      }
+    }
+
+    // Theme Switcher Logic
+    function initTheme() {
+      const savedTheme = localStorage.getItem('pulsesite_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcons(savedTheme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('pulsesite_theme', newTheme);
+      updateThemeIcons(newTheme);
+    }
+
+    function updateThemeIcons(theme) {
+      const sunIcon = document.getElementById('theme-icon-sun');
+      const moonIcon = document.getElementById('theme-icon-moon');
+      if (theme === 'dark') {
+        if (sunIcon) sunIcon.style.display = 'inline-block';
+        if (moonIcon) moonIcon.style.display = 'none';
+      } else {
+        if (sunIcon) sunIcon.style.display = 'none';
+        if (moonIcon) moonIcon.style.display = 'inline-block';
+      }
+    }
+
+    initTheme();
+
+    // Initialize Lucide Icons
+    if (window.lucide) lucide.createIcons();
 
     // Logout
     async function logout() {

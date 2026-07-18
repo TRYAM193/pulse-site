@@ -100,7 +100,7 @@ Instructions:
 `;
 
       const response = await generateContentWithRetry({
-        model: 'gemini-2.5-pro',
+        model: 'gemini-3.5-flash',
         contents: healingPrompt,
         config: {
           temperature: 0.1
@@ -151,7 +151,7 @@ Instructions:
 `;
 
       const response = await generateContentWithRetry({
-        model: 'gemini-2.5-pro',
+        model: 'gemini-3.5-flash',
         contents: healingPrompt,
         config: {
           temperature: 0.1

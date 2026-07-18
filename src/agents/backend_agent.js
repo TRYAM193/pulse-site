@@ -61,7 +61,7 @@ Instructions:
 `;
 
   const response = await generateContentWithRetry({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.5-flash',
     contents: prompt,
     config: {
       temperature: 0.1

@@ -3,28 +3,34 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const ai = new GoogleGenAI({
+// Enforce Vertex AI Client with location='global' and model='gemini-3.5-flash'
+export const vertexAi = new GoogleGenAI({
   vertexai: true,
   project: process.env.GCP_PROJECT_ID || 'web-automations-496916',
-  location: process.env.GCP_LOCATION || 'us-central1'
+  location: 'global'
 });
 
+// Export default ai instance
+export const ai = vertexAi;
+
 /**
- * Robust wrapper around generateContent that performs retries with exponential backoff
- * to handle transient network drops (fetch failed) or rate limits (429).
+ * Robust wrapper around generateContent using Vertex AI (location='global') and model='gemini-3.5-flash'.
  */
-export async function generateContentWithRetry(options, retries = 4, delay = 1500) {
+export async function generateContentWithRetry(options, retries = 3, delay = 1500) {
+  // Always enforce gemini-3.5-flash on global location
+  const modelName = 'gemini-3.5-flash';
+  const reqOptions = { ...options, model: modelName };
+
   for (let i = 0; i < retries; i++) {
     try {
-      return await ai.models.generateContent(options);
+      return await vertexAi.models.generateContent(reqOptions);
     } catch (err) {
-      console.warn(`[AI-Helper] Vertex AI call failed (Attempt ${i + 1}/${retries}): ${err.message || err}`);
+      console.warn(`[AI-Helper] Vertex AI (global gemini-3.5-flash) call failed (Attempt ${i + 1}/${retries}): ${err.message || err}`);
       if (i === retries - 1) {
-        throw new Error(`Vertex AI request failed after ${retries} attempts: ${err.message || err}`);
+        throw new Error(`AI generation failed after ${retries} attempts: ${err.message || err}`);
       }
-      console.log(`[AI-Helper] Retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
-      delay *= 2; // Exponential backoff
+      delay *= 2;
     }
   }
 }

@@ -32,6 +32,13 @@ export async function getDb() {
 
   // Database migrations
   await dbConnection.exec('ALTER TABLE bookings ADD COLUMN confirmed_slot TEXT').catch(() => {});
+  
+  // Safe column migrations for Outbound Campaigns
+  await dbConnection.exec('ALTER TABLE leads ADD COLUMN email TEXT').catch(() => {});
+  await dbConnection.exec('ALTER TABLE leads ADD COLUMN website TEXT').catch(() => {});
+  await dbConnection.exec("ALTER TABLE leads ADD COLUMN campaign_status TEXT DEFAULT 'none'").catch(() => {});
+  await dbConnection.exec('ALTER TABLE leads ADD COLUMN last_emailed_at TEXT').catch(() => {});
+  await dbConnection.exec('ALTER TABLE leads ADD COLUMN follow_up_count INTEGER DEFAULT 0').catch(() => {});
 
   await dbConnection.exec(`
     CREATE TABLE IF NOT EXISTS incidents (
@@ -43,6 +50,20 @@ export async function getDb() {
       message TEXT NOT NULL,
       resolution TEXT,
       created_at TEXT NOT NULL
+    )
+  `).catch(() => {});
+
+  await dbConnection.exec(`
+    CREATE TABLE IF NOT EXISTS email_campaigns (
+      id TEXT PRIMARY KEY,
+      lead_id TEXT NOT NULL,
+      email_type TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      body_html TEXT NOT NULL,
+      sent_at TEXT NOT NULL,
+      opened_at TEXT,
+      replied_at TEXT,
+      status TEXT NOT NULL DEFAULT 'sent'
     )
   `).catch(() => {});
 
