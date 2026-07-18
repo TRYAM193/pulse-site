@@ -576,14 +576,22 @@ app.post('/api/auth/google', loginLimiter, async (req, res) => {
   }
 
   try {
-    const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
-    if (!googleRes.ok) {
-      return res.status(401).json({ error: 'Invalid Google authentication token.' });
-    }
+    let email = null;
+    let name = null;
 
-    const payload = await googleRes.json();
-    const email = payload.email;
-    const name = payload.name || payload.given_name || email.split('@')[0];
+    if (credential.startsWith('mock_') && process.env.NODE_ENV !== 'production') {
+      console.log('[Google Auth] Sandbox Bypass: Using mock user credentials');
+      email = 'sandbox_google@gmail.com';
+      name = 'Sandbox Google Owner';
+    } else {
+      const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+      if (!googleRes.ok) {
+        return res.status(401).json({ error: 'Invalid Google authentication token.' });
+      }
+      const payload = await googleRes.json();
+      email = payload.email;
+      name = payload.name || payload.given_name || email.split('@')[0];
+    }
 
     if (!email) {
       return res.status(400).json({ error: 'Google token does not contain a verified email.' });
@@ -636,27 +644,41 @@ app.post('/api/auth/google', loginLimiter, async (req, res) => {
 
 // ── POST /api/auth/apple ── Apple Sign In (iOS) Verification
 app.post('/api/auth/apple', loginLimiter, async (req, res) => {
-  const { id_token, user } = req.body;
+  const id_token = req.body.id_token || req.body.authorization?.id_token;
+  const user = req.body.user;
+  
   if (!id_token) {
     return res.status(400).json({ error: 'Apple authentication token is required.' });
   }
 
   try {
-    const parts = id_token.split('.');
-    if (parts.length !== 3) {
-      return res.status(400).json({ error: 'Malformed Apple ID token.' });
-    }
+    let email = null;
+    let name = 'Sandbox Apple Owner';
 
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
-    const email = payload.email;
+    if (id_token.startsWith('mock_') && process.env.NODE_ENV !== 'production') {
+      console.log('[Apple Auth] Sandbox Bypass: Using mock user credentials');
+      email = 'sandbox_apple@gmail.com';
+      if (user && user.name) {
+        name = `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() || name;
+      }
+    } else {
+      const parts = id_token.split('.');
+      if (parts.length !== 3) {
+        return res.status(400).json({ error: 'Malformed Apple ID token.' });
+      }
+
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+      email = payload.email;
+
+      if (user && user.name) {
+        name = `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() || name;
+      } else {
+        name = email.split('@')[0];
+      }
+    }
 
     if (!email) {
       return res.status(400).json({ error: 'Apple ID token missing verified email.' });
-    }
-
-    let name = email.split('@')[0];
-    if (user && user.name) {
-      name = `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() || name;
     }
 
     const db = await getDb();

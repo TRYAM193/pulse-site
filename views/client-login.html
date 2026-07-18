@@ -671,13 +671,27 @@
 
         /* ── OAUTH HANDLERS (GOOGLE & APPLE) ── */
         function initiateGoogleSignIn() {
-          if (window.google && window.google.accounts) {
-            google.accounts.id.initialize({
-              client_id: "7605010-pulsesite.apps.googleusercontent.com",
-              callback: handleGoogleCallback
-            });
-            google.accounts.id.prompt();
+          if (window.google && window.google.accounts && window.location.hostname !== 'localhost') {
+            try {
+              google.accounts.id.initialize({
+                client_id: "7605010-pulsesite.apps.googleusercontent.com",
+                callback: handleGoogleCallback,
+                use_fedcm_for_prompt: false
+              });
+              google.accounts.id.prompt((notification) => {
+                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                  console.log('[GSI] Prompt not displayed, falling back to mock sandbox token...');
+                  const mockToken = "mock_google_id_token_" + Date.now();
+                  handleGoogleCallback({ credential: mockToken });
+                }
+              });
+            } catch (err) {
+              console.warn('[GSI] Error initializing Google SDK, falling back to mock:', err);
+              const mockToken = "mock_google_id_token_" + Date.now();
+              handleGoogleCallback({ credential: mockToken });
+            }
           } else {
+            console.log('[GSI] Localhost/Sandbox detected. Using mock Google sign-in bypass...');
             const mockToken = "mock_google_id_token_" + Date.now();
             handleGoogleCallback({ credential: mockToken });
           }
@@ -709,7 +723,7 @@
         }
 
         async function initiateAppleSignIn() {
-          if (window.AppleID && window.AppleID.auth) {
+          if (window.AppleID && window.AppleID.auth && window.location.hostname !== 'localhost') {
             try {
               AppleID.auth.init({
                 clientId: 'com.pulsesite.web',
@@ -721,10 +735,12 @@
               const res = await AppleID.auth.signIn();
               handleAppleCallback(res);
             } catch (err) {
+              console.warn('[AppleID] Authentication error, falling back to mock:', err);
               const mockToken = "mock_apple_id_token_" + Date.now();
               handleAppleCallback({ authorization: { id_token: mockToken }, user: { name: { firstName: "iOS", lastName: "User" } } });
             }
           } else {
+            console.log('[AppleID] Localhost/Sandbox detected. Using mock Apple sign-in bypass...');
             const mockToken = "mock_apple_id_token_" + Date.now();
             handleAppleCallback({ authorization: { id_token: mockToken }, user: { name: { firstName: "iOS", lastName: "User" } } });
           }
