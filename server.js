@@ -1841,6 +1841,9 @@ app.post('/api/webhook/whatsapp', async (req, res) => {
     console.error(`[WhatsApp] Error:`, err.message);
     res.type('text/xml');
     res.send(`<Response><Message>⚠️ Unable to process update. Please verify your subscription.</Message></Response>`);
+  }
+});
+
 // ── POST /api/webhooks/client-reply ── Webhook for client sales chat responses (WhatsApp/Email)
 app.post('/api/webhooks/client-reply', async (req, res) => {
   const { leadId, message, channel } = req.body;
