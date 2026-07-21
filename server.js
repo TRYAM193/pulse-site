@@ -1337,6 +1337,7 @@ app.post('/api/clients/:clientId/subscribe', validateClientIdParam, requireAdmin
     if (!client) return res.status(404).json({ success: false, error: 'Client not found.' });
 
     const lemonKey = process.env.LEMON_SQUEEZY_API_KEY;
+    const customPaymentUrl = process.env.CUSTOM_PAYMENT_URL;
     const stripeApiKey = process.env.STRIPE_SECRET_KEY;
     const paymentToken = generatePaymentSuccessToken(clientId);
 
@@ -1349,6 +1350,12 @@ app.post('/api/clients/:clientId/subscribe', validateClientIdParam, requireAdmin
         console.error('[LemonSqueezy] Failed to create checkout:', lemonErr.message);
         return res.status(500).json({ success: false, error: 'Lemon Squeezy checkout failed: ' + lemonErr.message });
       }
+    }
+
+    if (customPaymentUrl) {
+      console.log(`[Payment] Directing client ${clientId} to CUSTOM_PAYMENT_URL: ${customPaymentUrl}`);
+      const separator = customPaymentUrl.includes('?') ? '&' : '?';
+      return res.json({ url: `${customPaymentUrl}${separator}clientId=${clientId}` });
     }
 
     if (!stripeApiKey) {
@@ -1678,6 +1685,7 @@ app.post('/api/clients/:clientId/subscribe-public', validateClientIdParam, async
     if (!client) return res.status(404).json({ success: false, error: 'Client not found.' });
 
     const lemonKey = process.env.LEMON_SQUEEZY_API_KEY;
+    const customPaymentUrl = process.env.CUSTOM_PAYMENT_URL;
     const stripeApiKey = process.env.STRIPE_SECRET_KEY;
     const paymentToken = generatePaymentSuccessToken(clientId);
 
@@ -1690,6 +1698,12 @@ app.post('/api/clients/:clientId/subscribe-public', validateClientIdParam, async
         console.error('[LemonSqueezy] Failed to create checkout:', lemonErr.message);
         return res.status(500).json({ success: false, error: 'Lemon Squeezy checkout failed: ' + lemonErr.message });
       }
+    }
+
+    if (customPaymentUrl) {
+      console.log(`[Payment Public] Directing client ${clientId} to CUSTOM_PAYMENT_URL: ${customPaymentUrl}`);
+      const separator = customPaymentUrl.includes('?') ? '&' : '?';
+      return res.json({ url: `${customPaymentUrl}${separator}clientId=${clientId}` });
     }
 
     if (!stripeApiKey) {
