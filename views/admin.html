@@ -992,7 +992,7 @@
         const activity = await activityRes.json();
         
         const feedContainer = document.getElementById('activity-feed');
-        if (activity.length === 0) {
+        if (!Array.isArray(activity) || activity.length === 0) {
           feedContainer.innerHTML = `<p style="color: #9ca3af; padding: 1rem 0;">No live traffic events logged yet.</p>`;
           return;
         }
