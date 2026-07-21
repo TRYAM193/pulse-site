@@ -1878,6 +1878,19 @@ app.listen(PORT, async () => {
 
   // Start Outbound Outreach Campaign Daily Scheduler
   console.log(`[Scheduler] Outbound campaign scheduler initialized.`);
+
+  // Auto-seed initial leads & campaign cycle if database is fresh (0 leads)
+  try {
+    const db = await getDb();
+    const leadCount = await db.get('SELECT COUNT(*) as count FROM leads');
+    if ((leadCount?.count || 0) === 0) {
+      console.log('[Startup] Fresh database detected on server startup. Triggering initial lead discovery & review audit cycle...');
+      const { runDailyCampaignCycle } = await import('./src/services/outreach_engine.js');
+      runDailyCampaignCycle().catch(err => console.error('[Startup] Initial campaign cycle error:', err));
+    }
+  } catch (seedErr) {
+    console.error('[Startup] Lead seed check error:', seedErr.message);
+  }
   
   // Set interval to check every minute for the 9:00 AM target time
   setInterval(async () => {
