@@ -53,6 +53,22 @@ export async function getDb() {
     )
   `).catch(() => {});
 
+  await dbConnection.exec('ALTER TABLE leads ADD COLUMN phone TEXT').catch(() => {});
+  await dbConnection.exec("ALTER TABLE leads ADD COLUMN outreach_channel TEXT DEFAULT 'email'").catch(() => {});
+  await dbConnection.exec('ALTER TABLE leads ADD COLUMN review_audit_json TEXT').catch(() => {});
+
+  await dbConnection.exec(`
+    CREATE TABLE IF NOT EXISTS conversations (
+      id TEXT PRIMARY KEY,
+      lead_id TEXT NOT NULL,
+      channel TEXT NOT NULL,
+      sender TEXT NOT NULL,
+      message TEXT NOT NULL,
+      timestamp TEXT NOT NULL,
+      FOREIGN KEY (lead_id) REFERENCES leads(id)
+    )
+  `).catch(() => {});
+
   await dbConnection.exec(`
     CREATE TABLE IF NOT EXISTS email_campaigns (
       id TEXT PRIMARY KEY,

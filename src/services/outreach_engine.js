@@ -8,6 +8,9 @@ import { getDb } from '../db/connection.js';
 import { GoogleGenAI } from '@google/genai';
 import { NICHE_PAIN_POINTS, getEmailHtml } from './email_templates.js';
 import { getAppBaseUrl } from '../utils/ai_helper.js';
+import { auditBusinessReviews } from '../agents/review_auditor.js';
+import { generateStoryPitch } from './story_pitcher.js';
+import { dispatchMultiChannelPitch } from './multi_channel_dispatcher.js';
 
 // Swarm Agent Imports for Auto-Building Website Previews
 import { sourceBrandAssets } from '../agents/brand_sourcer.js';
@@ -50,7 +53,7 @@ const SENDER_EMAIL = process.env.SMTP_FROM || process.env.SMTP_USER || 'pulsesit
  * @param {object} lead
  * @returns {Promise<string>} Preview URL
  */
-async function buildWebsitePreviewForLead(lead) {
+export async function buildWebsitePreviewForLead(lead) {
   const clientDir = path.join(rootDir, 'data', 'clients', lead.id);
   const briefPath = path.join(clientDir, 'brief.json');
   const indexHtmlPath = path.join(clientDir, 'index.html');
@@ -199,7 +202,7 @@ async function sendOutreachEmail(lead, emailType, subject, bodyHtml) {
  * @param {string} emailType - 'cold_intro' | 'follow_up_1' | 'follow_up_2'
  * @returns {Promise<{subject: string, body: string}>} Generated email subject and body
  */
-async function generateOutreachPitch(lead, emailType) {
+export async function generateOutreachPitch(lead, emailType) {
   const painPoints = NICHE_PAIN_POINTS[lead.niche] || NICHE_PAIN_POINTS.default;
   const targetUrl = `${getAppBaseUrl()}/client/${lead.id}/`;
 
@@ -366,24 +369,28 @@ export async function runDailyCampaignCycle() {
 
   for (const lead of targetNewLeads) {
     try {
-      // Step A: Auto-generate their live site preview first!
-      await buildWebsitePreviewForLead(lead);
+      const leadObj = {
+        id: lead.id || lead.business_name,
+        businessName: lead.businessName || lead.business_name,
+        niche: lead.niche,
+        rating: lead.rating || 4.8,
+        city: lead.city || 'Seattle',
+        email: lead.email,
+        phone: lead.phone
+      };
 
-      // Step B: Draft personalized email with pain points
-      const pitch = await generateOutreachPitch(lead, 'cold_intro');
-      
-      // Step C: Send the cold intro email
-      const emailSent = await sendOutreachEmail(lead, 'cold_intro', pitch.subject, pitch.body);
+      // Step A: Audit public reviews & find lost-customer story
+      const auditData = await auditBusinessReviews(leadObj);
 
-      if (emailSent) {
-        await db.run(`
-          UPDATE leads 
-          SET campaign_status = 'day1_sent', last_emailed_at = ?, follow_up_count = 1 
-          WHERE id = ?
-        `, [new Date().toISOString(), lead.id]);
-      }
+      // Step B: Draft psychological storytelling pitch
+      const channel = leadObj.phone ? 'whatsapp' : 'email';
+      const pitch = await generateStoryPitch(leadObj, auditData, channel);
+
+      // Step C: Dispatch via WhatsApp (if phone) or Email (fallback)
+      await dispatchMultiChannelPitch(leadObj, pitch);
+
     } catch (err) {
-      console.error(`[OutreachEngine] Failed initial outreach workflow for ${lead.businessName}:`, err.message);
+      console.error(`[OutreachEngine] Failed initial outreach workflow for ${lead.businessName || lead.business_name}:`, err.message);
     }
   }
 

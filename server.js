@@ -24,6 +24,7 @@ import { generateSeoMetadata, renderSeoHead } from './src/agents/seo_agent.js';
 import { handleSupportTicket } from './src/agents/support_agent.js';
 import { sendUrgentAlert } from './src/services/notifier.js';
 import { getAppBaseUrl } from './src/utils/ai_helper.js';
+import { handleClientSalesChat } from './src/agents/sales_closer.js';
 import Stripe from 'stripe';
 import Razorpay from 'razorpay';
 
@@ -1826,6 +1827,19 @@ app.post('/api/webhook/whatsapp', async (req, res) => {
     console.error(`[WhatsApp] Error:`, err.message);
     res.type('text/xml');
     res.send(`<Response><Message>⚠️ Unable to process update. Please verify your subscription.</Message></Response>`);
+// ── POST /api/webhooks/client-reply ── Webhook for client sales chat responses (WhatsApp/Email)
+app.post('/api/webhooks/client-reply', async (req, res) => {
+  const { leadId, message, channel } = req.body;
+  if (!leadId || !message) {
+    return res.status(400).json({ error: 'leadId and message are required.' });
+  }
+
+  try {
+    const result = await handleClientSalesChat(leadId, message, channel || 'whatsapp');
+    res.json({ success: true, result });
+  } catch (err) {
+    console.error('[SalesCloser Webhook] Error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
