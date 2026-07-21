@@ -23,6 +23,7 @@ import { generateClientBackend } from './src/agents/backend_agent.js';
 import { generateSeoMetadata, renderSeoHead } from './src/agents/seo_agent.js';
 import { handleSupportTicket } from './src/agents/support_agent.js';
 import { sendUrgentAlert } from './src/services/notifier.js';
+import { getAppBaseUrl } from './src/utils/ai_helper.js';
 import Stripe from 'stripe';
 import Razorpay from 'razorpay';
 
@@ -1811,13 +1812,13 @@ app.post('/api/webhook/whatsapp', async (req, res) => {
 
     if (matchedClient && matchedClient.stripe_status !== 'active') {
       res.type('text/xml');
-      return res.send(`<Response><Message>🔒 Your account is in Free Preview mode. Upgrade to Pro at http://localhost:${PORT}/client-login to enable WhatsApp AI updates.</Message></Response>`);
+      return res.send(`<Response><Message>🔒 Your account is in Free Preview mode. Upgrade to Pro at ${getAppBaseUrl()}/client-login to enable WhatsApp AI updates.</Message></Response>`);
     }
 
     console.log(`[WhatsApp] Routing update to client: ${clientId}`);
     const updatedData = await processClientUpdate(clientId, messageBody);
 
-    const replyText = `🤖 AutoAgency AI — Update Successful!\n\nYour website has been updated with your changes. View it here:\nhttp://localhost:${PORT}/client/${clientId}/`;
+    const replyText = `🤖 AutoAgency AI — Update Successful!\n\nYour website has been updated with your changes. View it here:\n${getAppBaseUrl()}/client/${clientId}/`;
 
     res.type('text/xml');
     res.send(`<Response><Message>${replyText}</Message></Response>`);
@@ -1833,14 +1834,15 @@ app.post('/api/webhook/whatsapp', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════
 
 app.listen(PORT, async () => {
+  const baseUrl = getAppBaseUrl();
   console.log(`\n==================================================`);
-  console.log(`🌐 PulseSite SaaS running at http://localhost:${PORT}`);
+  console.log(`🌐 PulseSite SaaS running at ${baseUrl}`);
   console.log(`─────────────────────────────────────────────────`);
-  console.log(`  Admin Console:  http://localhost:${PORT}/admin`);
-  console.log(`  Admin Login:    http://localhost:${PORT}/admin/login`);
-  console.log(`  Client Login:   http://localhost:${PORT}/client-login`);
-  console.log(`  Client Portal:  http://localhost:${PORT}/portal/test_client`);
-  console.log(`  Test Website:   http://localhost:${PORT}/client/test_client/`);
+  console.log(`  Admin Console:  ${baseUrl}/admin`);
+  console.log(`  Admin Login:    ${baseUrl}/admin/login`);
+  console.log(`  Client Login:   ${baseUrl}/client-login`);
+  console.log(`  Client Portal:  ${baseUrl}/portal/test_client`);
+  console.log(`  Test Website:   ${baseUrl}/client/test_client/`);
   console.log(`==================================================\n`);
 
   // Start Outbound Outreach Campaign Daily Scheduler

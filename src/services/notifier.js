@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import { getAppBaseUrl } from '../utils/ai_helper.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(path.join(__dirname, '..', '..'));
@@ -45,7 +46,7 @@ ${details}
 
 ${stackTrace ? `Stack Trace:\n${stackTrace}\n` : ''}
 ================================================================================
-Action Required: Please inspect the admin console at http://localhost:4000/admin
+Action Required: Please inspect the admin console at ${getAppBaseUrl()}/admin
 ================================================================================
 `;
 
@@ -101,7 +102,7 @@ Action Required: Please inspect the admin console at http://localhost:4000/admin
           <div style="background:#111;padding:15px;border-left:4px solid #ef4444;margin:15px 0;border-radius:6px;">
             <pre style="color:#eee;white-space:pre-wrap;font-family:monospace;font-size:0.9rem;">${details}</pre>
           </div>
-          <p><a href="http://localhost:4000/admin" style="background:#fff;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">Open Admin Console</a></p>
+          <p><a href="${getAppBaseUrl()}/admin" style="background:#fff;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">Open Admin Console</a></p>
         </div>`
       };
 

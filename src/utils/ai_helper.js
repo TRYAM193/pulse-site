@@ -34,3 +34,12 @@ export async function generateContentWithRetry(options, retries = 3, delay = 150
     }
   }
 }
+
+/**
+ * Resolves the public application base URL for outreach emails, links, and callbacks.
+ * Prioritizes APP_URL, RENDER_EXTERNAL_URL (Render live domain), falling back to localhost.
+ */
+export function getAppBaseUrl() {
+  const url = process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 4000}`;
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+}

@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import { getDb } from '../db/connection.js';
+import { getAppBaseUrl } from '../utils/ai_helper.js';
 
 dotenv.config();
 
@@ -200,7 +201,7 @@ Here are the details of the business:
 Draft a message that:
 1. Praises their strong Google Maps reputation (mentioning their rating).
 2. Explains clearly, without being pushy, how not having a website is costing them an estimated $${lead.estimatedMissedRevenue || lead.lost_revenue} in bookings/sales every month.
-3. Mentions that we have already built a fully functioning custom website preview for them: http://localhost:4000/client/${lead.id}
+3. Mentions that we have already built a fully functioning custom website preview for them: ${getAppBaseUrl()}/client/${lead.id}/
 4. Asks them if they'd like to activate it on their custom domain.
 5. Keep the tone friendly, professional, and helpful. Do not use corporate fluff. Keep it under 150 words.
 `;

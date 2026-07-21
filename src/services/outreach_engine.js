@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { getDb } from '../db/connection.js';
 import { GoogleGenAI } from '@google/genai';
 import { NICHE_PAIN_POINTS, getEmailHtml } from './email_templates.js';
+import { getAppBaseUrl } from '../utils/ai_helper.js';
 
 // Swarm Agent Imports for Auto-Building Website Previews
 import { sourceBrandAssets } from '../agents/brand_sourcer.js';
@@ -64,7 +65,7 @@ async function buildWebsitePreviewForLead(lead) {
   // Check if preview already compiled to save resources
   if (fs.existsSync(indexHtmlPath) && fs.existsSync(styleCssPath)) {
     console.log(`[OutreachEngine] Preview already built for lead: ${lead.businessName}`);
-    return `http://localhost:${process.env.PORT || 4000}/client/${lead.id}/`;
+    return `${getAppBaseUrl()}/client/${lead.id}/`;
   }
 
   console.log(`[OutreachEngine] 🚀 Triggering Agent Swarm to auto-build website preview for: ${lead.businessName}`);
@@ -131,7 +132,7 @@ async function buildWebsitePreviewForLead(lead) {
   ]);
 
   console.log(`[OutreachEngine] ✅ Website preview built and client registered for: ${lead.businessName}`);
-  return `http://localhost:${process.env.PORT || 4000}/client/${lead.id}/`;
+  return `${getAppBaseUrl()}/client/${lead.id}/`;
 }
 
 /**
@@ -143,7 +144,7 @@ async function buildWebsitePreviewForLead(lead) {
  * @returns {Promise<boolean>}
  */
 async function sendOutreachEmail(lead, emailType, subject, bodyHtml) {
-  const ctaUrl = `http://localhost:${process.env.PORT || 4000}/client/${lead.id}`;
+  const ctaUrl = `${getAppBaseUrl()}/client/${lead.id}/`;
   const fullHtml = getEmailHtml(lead, subject, bodyHtml, ctaUrl);
 
   console.log(`[OutreachEngine] Preparing email dispatch [Type: ${emailType}] to ${lead.email}`);
@@ -200,7 +201,7 @@ async function sendOutreachEmail(lead, emailType, subject, bodyHtml) {
  */
 async function generateOutreachPitch(lead, emailType) {
   const painPoints = NICHE_PAIN_POINTS[lead.niche] || NICHE_PAIN_POINTS.default;
-  const targetUrl = `http://localhost:${process.env.PORT || 4000}/client/${lead.id}/`;
+  const targetUrl = `${getAppBaseUrl()}/client/${lead.id}/`;
 
   let prompt = '';
   
