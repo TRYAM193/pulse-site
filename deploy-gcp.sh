@@ -27,7 +27,7 @@ gcloud run deploy $SERVICE_NAME \
   --region $REGION \
   --allow-unauthenticated \
   --port 8080 \
-  --set-env-vars "NODE_ENV=production,CRON_SECRET=pulsesite-gcp-cron-secret-2026"
+  --set-env-vars "NODE_ENV=production,CRON_SECRET=pulsesite-gcp-cron-secret-2026,SUPABASE_URL=https://yakxilrzdbxhbyuddnjq.supabase.co,SUPABASE_KEY=sb_publishable_zNyWhFh6Qb7qCl8CHo7mNQ_0mnKL1s-,SUPABASE_SERVICE_ROLE_KEY=sb_publishable_zNyWhFh6Qb7qCl8CHo7mNQ_0mnKL1s-"
 
 # 4. Get Cloud Run Service URL
 SERVICE_URL=$(gcloud run services describe $SERVICE_NAME --region $REGION --format 'value(status.url)')
