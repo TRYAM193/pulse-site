@@ -6,6 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "build": "cd client && npm install && npm run build",
+    "build:client": "cd client && npm run build",
     "postinstall": "npm rebuild sqlite3 --build-from-source",
     "simulate": "node scratch/simulate_whatsapp.js",
     "prospect": "node scratch/test_prospector.js",
@@ -13,6 +15,7 @@
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
+    "@supabase/supabase-js": "^2.110.8",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",

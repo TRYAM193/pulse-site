@@ -384,54 +384,43 @@ The ${bizName} Team
 //  PAGE SERVING (HTML)
 // ═══════════════════════════════════════════════════════════════
 
-// ── GET / ── SaaS landing page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(rootDir, 'views', 'index.html'));
-});
+// ── React SPA & Page Serving ──────────────────────────────────
+const distDir = path.join(rootDir, 'dist');
+const hasReactBuild = fs.existsSync(distDir);
 
-// ── GET /admin/login ── Admin login page
-app.get('/admin/login', (req, res) => {
-  res.sendFile(path.join(rootDir, 'views', 'admin-login.html'));
-});
+if (hasReactBuild) {
+  console.log('[Server] React production build detected in /dist. Serving React SPA.');
+  app.use(express.static(distDir));
 
-// ── GET /admin ── Admin dashboard
-app.get('/admin', (req, res) => {
-  const token = req.cookies?.admin_token;
-  if (!token) return res.redirect('/admin/login');
-  try {
-    jwt.verify(token, JWT_SECRET);
+  app.get(['/', '/admin', '/admin/login', '/client-login', '/client-signup', '/portal/*'], (req, res) => {
+    res.sendFile(path.join(distDir, 'index.html'));
+  });
+} else {
+  // Fallback to HTML views if dist is not built yet
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(rootDir, 'views', 'index.html'));
+  });
+
+  app.get('/admin/login', (req, res) => {
+    res.sendFile(path.join(rootDir, 'views', 'admin-login.html'));
+  });
+
+  app.get('/admin', (req, res) => {
     res.sendFile(path.join(rootDir, 'views', 'admin.html'));
-  } catch {
-    res.clearCookie('admin_token');
-    res.redirect('/admin/login');
-  }
-});
+  });
 
-// ── GET /client-login ── Client login page
-app.get('/client-login', (req, res) => {
-  res.sendFile(path.join(rootDir, 'views', 'client-login.html'));
-});
+  app.get('/client-login', (req, res) => {
+    res.sendFile(path.join(rootDir, 'views', 'client-login.html'));
+  });
 
-// ── GET /client-signup ── Client signup page
-app.get('/client-signup', (req, res) => {
-  res.sendFile(path.join(rootDir, 'views', 'client-signup.html'));
-});
+  app.get('/client-signup', (req, res) => {
+    res.sendFile(path.join(rootDir, 'views', 'client-signup.html'));
+  });
 
-// ── GET /portal/:clientId ── Client portal dashboard
-app.get('/portal/:clientId', validateClientIdParam, (req, res) => {
-  const token = req.cookies?.client_token;
-  if (!token) return res.redirect('/client-login');
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (decoded.clientId !== req.params.clientId) {
-      return res.redirect('/client-login');
-    }
+  app.get('/portal/:clientId', validateClientIdParam, (req, res) => {
     res.sendFile(path.join(rootDir, 'views', 'portal.html'));
-  } catch {
-    res.clearCookie('client_token');
-    res.redirect('/client-login');
-  }
-});
+  });
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  ADMIN AUTH ENDPOINTS
@@ -1856,6 +1845,30 @@ app.post('/api/webhooks/client-reply', async (req, res) => {
     res.json({ success: true, result });
   } catch (err) {
     console.error('[SalesCloser Webhook] Error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ── POST /api/cron/daily-outreach ── GCP Cloud Scheduler Trigger
+app.post('/api/cron/daily-outreach', async (req, res) => {
+  const cronSecret = process.env.CRON_SECRET;
+  const authHeader = req.headers['x-cron-secret'] || req.headers['authorization'];
+
+  if (cronSecret && authHeader !== cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    return res.status(401).json({ success: false, error: 'Unauthorized Cloud Scheduler request.' });
+  }
+
+  console.log('[GCP Cloud Scheduler] 🕒 Triggering automated daily 10-company campaign cycle...');
+  try {
+    const { runDailyCampaignCycle } = await import('./src/services/outreach_engine.js');
+    // Run asynchronously or await
+    runDailyCampaignCycle()
+      .then(() => console.log('[GCP Cloud Scheduler] Daily campaign cycle execution completed.'))
+      .catch(err => console.error('[GCP Cloud Scheduler] Campaign error:', err));
+
+    res.json({ success: true, message: 'Daily outreach campaign cycle triggered successfully by GCP Cloud Scheduler.' });
+  } catch (err) {
+    console.error('[GCP Cloud Scheduler] Error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });

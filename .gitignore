@@ -19,3 +19,5 @@ data/logs/
 # Build / dist
 dist/
 build/
+client/node_modules/
+client/dist/
